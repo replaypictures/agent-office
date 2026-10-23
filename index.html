@@ -98,6 +98,15 @@
       box-shadow: 3px 3px 0 #000;
       border-radius: 3px;
       cursor: pointer;
+      user-select: none;
+      transition: all 0.1s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+      box-shadow: 3px 3px 0 #000;
+      border-radius: 3px;
+      cursor: pointer;
       display: flex;
       align-items: center;
       gap: 4px;
@@ -329,14 +338,63 @@
     /* Mobile D-Pad on Screen */
     #mobile-dpad {
       position: absolute;
-      bottom: 68px;
+      bottom: 74px;
       left: 18px;
       width: 110px;
       height: 110px;
       z-index: 110;
-      display: none;
+      display: block;
       pointer-events: auto;
       touch-action: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    #mobile-dpad.hidden {
+      display: none !important;
+    }
+
+    /* Slack Chat Bar */
+    .slack-chat-bar {
+      pointer-events: auto;
+      width: 100%;
+      max-width: 540px;
+      margin-bottom: 6px;
+    }
+    .chat-input-wrapper {
+      display: flex;
+      gap: 6px;
+      background: rgba(20, 22, 29, 0.95);
+      border: 3px solid #f1c40f;
+      box-shadow: 4px 4px 0 #000;
+      border-radius: 4px;
+      padding: 6px 8px;
+      align-items: center;
+    }
+    .chat-badge {
+      font-size: 0.78rem;
+      font-weight: bold;
+      color: #f1c40f;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    #slack-input {
+      flex: 1;
+      background: #1e272e;
+      border: 1px solid #485460;
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.82rem;
+      padding: 6px 10px;
+      border-radius: 3px;
+      outline: none;
+    }
+    #slack-input:focus {
+      border-color: #f1c40f;
+      background: #2f3640;
+    }
+    #btn-send-slack {
+      white-space: nowrap;
     }
     .dpad-btn {
       position: absolute;
@@ -395,7 +453,8 @@
       </div>
     </div>
     <div class="header-actions">
-      <button class="retro-btn" id="btn-sound">🔊 효과음</button>
+      <button class="retro-btn active" id="btn-dpad-toggle">🎮 방향키</button>
+      <button class="retro-btn" id="btn-sound">🔊 소리</button>
       <button class="retro-btn" id="btn-fit">🔍 맞춤</button>
       <button class="retro-btn" id="btn-zoom-boss">👤 사장님</button>
     </div>
@@ -429,11 +488,21 @@
   </div>
 
   <div class="bottom-bar">
-    <div class="team-modes">
-      <button class="retro-btn primary" id="mode-desks">🏢 전원 데스크</button>
-      <button class="retro-btn success" id="mode-meeting">📊 회의 소집</button>
-      <button class="retro-btn" id="mode-coffee">☕ 탕비실 티타임</button>
-      <button class="retro-btn" id="mode-lounge">🛋️ 휴게 라운지</button>
+    <div style="display:flex; flex-direction:column; gap:6px; pointer-events:auto; width:100%; max-width:540px;">
+      <div class="slack-chat-bar">
+        <form id="slack-form" class="chat-input-wrapper" onsubmit="event.preventDefault(); sendSlackChat();">
+          <span class="chat-badge">👤 사장님</span>
+          <input type="text" id="slack-input" placeholder="에이전트들에게 슬랙 메시지 전달... (Enter)" autocomplete="off">
+          <button type="submit" class="retro-btn primary" id="btn-send-slack">전송 🚀</button>
+        </form>
+      </div>
+
+      <div class="team-modes">
+        <button class="retro-btn primary" id="mode-desks">🏢 전원 데스크</button>
+        <button class="retro-btn success" id="mode-meeting">📊 회의 소집</button>
+        <button class="retro-btn" id="mode-coffee">☕ 탕비실 티타임</button>
+        <button class="retro-btn" id="mode-lounge">🛋️ 휴게 라운지</button>
+      </div>
     </div>
 
     <div class="agent-selectors">
@@ -967,6 +1036,7 @@ container.addEventListener('wheel', (e) => {
 // Keyboard controls
 const keys = {};
 window.addEventListener('keydown', (e) => {
+  if (document.activeElement === document.getElementById('slack-input')) return;
   keys[e.key] = true;
   if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) {
     e.preventDefault();
@@ -976,8 +1046,65 @@ window.addEventListener('keydown', (e) => {
   }
 });
 window.addEventListener('keyup', (e) => {
+  if (document.activeElement === document.getElementById('slack-input')) return;
   keys[e.key] = false;
 });
+
+// Mobile D-Pad & Toggle
+const dpadEl = document.getElementById('mobile-dpad');
+const dpadBtn = document.getElementById('btn-dpad-toggle');
+if (dpadBtn && dpadEl) {
+  dpadBtn.addEventListener('click', () => {
+    play8BitSound('click');
+    const isHidden = dpadEl.classList.toggle('hidden');
+    dpadBtn.classList.toggle('active', !isHidden);
+    showToast(isHidden ? '🎮 방향키 숨김' : '🎮 방향키 표시');
+  });
+}
+
+// Send Slack Chat from Office
+function sendSlackChat() {
+  const input = document.getElementById('slack-input');
+  const text = (input.value || '').trim();
+  if (!text) return;
+
+  input.value = '';
+  input.blur();
+
+  play8BitSound('fanfare');
+  entities.boss.say('"' + text + '"', 7.0);
+  camera.followBoss = true;
+
+  // Agents respond
+  setTimeout(() => {
+    entities.pickle.say('사장님 말씀 접수 완료! 🫡', 5.0);
+    entities.muse.say('슬랙 #agent 채널 확인 완료! 📝', 5.0);
+    entities.genspark.say('실시간 채널 연동 이상 무! ⚡', 5.0);
+    entities.chatgpt.say('명령 처리 프로세스 가동! 🤖', 5.0);
+  }, 600);
+
+  // Copy to clipboard & toast
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).catch(() => {});
+  }
+  showToast('📢 슬랙 #agent 채널로 전송 (' + (text.length > 15 ? text.substring(0, 15) + '...' : text) + ')');
+
+  // Try webhook if configured
+  const webhook = localStorage.getItem('rp_slack_webhook');
+  if (webhook) {
+    try {
+      fetch(webhook, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: `[사장님 오피스] ${text}` })
+      });
+    } catch (err) {}
+  }
+
+  // Open Slack app / web
+  window.open('https://slack.com/app_redirect?channel=C0CA19MD719', '_blank');
+}
 
 // Mobile D-Pad
 function setupDpadButton(btnId, vx, vy) {
