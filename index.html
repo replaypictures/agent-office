@@ -336,22 +336,24 @@
       z-index: 110;
       display: none;
       pointer-events: auto;
+      touch-action: none;
     }
     .dpad-btn {
       position: absolute;
       width: 36px;
       height: 36px;
-      background: rgba(44, 62, 80, 0.85);
+      background: rgba(44, 62, 80, 0.92);
       border: 2px solid #000;
       box-shadow: 2px 2px 0 #000;
       border-radius: 4px;
       color: #f1c40f;
       font-weight: bold;
-      font-size: 1rem;
+      font-size: 1.1rem;
       display: flex;
       align-items: center;
       justify-content: center;
       user-select: none;
+      touch-action: none;
     }
     .dpad-btn:active {
       background: #f1c40f;
@@ -865,11 +867,22 @@ window.addEventListener('resize', resizeCanvas);
 function fitMapToScreen() {
   const scaleX = window.innerWidth / MAP_WIDTH;
   const scaleY = window.innerHeight / MAP_HEIGHT;
-  camera.targetZoom = Math.min(scaleX, scaleY) * 0.95;
-  camera.targetX = MAP_WIDTH / 2;
-  camera.targetY = MAP_HEIGHT / 2;
-  camera.followBoss = false;
-  showToast('🔍 화면 크기에 맞춤');
+  const isMobile = window.innerWidth <= 768;
+
+  if (isMobile) {
+    // On mobile portrait, focus on the central office & Boss with comfortable zoom
+    camera.targetZoom = Math.max(0.65, Math.min(scaleX, scaleY) * 1.5);
+    camera.targetX = entities.boss.x;
+    camera.targetY = entities.boss.y - 80;
+    camera.followBoss = true;
+    showToast('📱 모바일 사장님 중심 뷰 맞춤');
+  } else {
+    camera.targetZoom = Math.min(scaleX, scaleY) * 0.95;
+    camera.targetX = MAP_WIDTH / 2;
+    camera.targetY = MAP_HEIGHT / 2;
+    camera.followBoss = false;
+    showToast('🔍 화면 크기에 맞춤');
+  }
 }
 
 // 6. Interaction & Input Handling
