@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ReplayPictures AI Agent Office 🏢</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-cream: #F7F5F0;
+      --bg-dark: #121816;
+      --text-main: #2D3748;
+      --text-muted: #718096;
+      --accent-teal: #2A9D8F;
+      --accent-mustard: #E9C46A;
+      --accent-orange: #E76F51;
+      --accent-green: #52796F;
+      --wood: #8D5B4C;
+      --panel-bg: rgba(255, 255, 255, 0.88);
+      --panel-border: rgba(0, 0, 0, 0.08);
+      --shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+    }
+
+    body.dark {
+      --bg-cream: #121816;
+      --text-main: #EDE8DF;
+      --text-muted: #A0AEC0;
+      --panel-bg: rgba(22, 32, 28, 0.88);
+      --panel-border: rgba(255, 255, 255, 0.1);
+      --shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: var(--bg-cream);
+      color: var(--text-main);
+      transition: background-color 0.4s ease, color 0.4s ease;
+    }
+
+    #webgl-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    /* UI Header */
+    header {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      right: 20px;
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: none;
+    }
+
+    .brand {
+      pointer-events: auto;
+      background: var(--panel-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 12px 20px;
+      border-radius: 18px;
+      border: 1px solid var(--panel-border);
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      font-size: 24px;
+      animation: bounce 2s infinite ease-in-out;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+
+    .brand-text h1 {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--text-main);
+    }
+
+    .brand-text p {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .controls {
+      pointer-events: auto;
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-icon {
+      background: var(--panel-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--panel-border);
+      color: var(--text-main);
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .btn-icon:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent-teal);
+    }
+
+    .btn-icon:active {
+      transform: scale(0.95);
+    }
+
+    /* Agent Roster Bar (Bottom) */
+    .roster-bar {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      display: flex;
+      gap: 10px;
+      background: var(--panel-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      padding: 8px 12px;
+      border-radius: 22px;
+      border: 1px solid var(--panel-border);
+      box-shadow: var(--shadow);
+      max-width: 95vw;
+      overflow-x: auto;
+    }
+
+    .agent-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+
+    .agent-pill:hover {
+      background: rgba(0, 0, 0, 0.04);
+      transform: translateY(-2px);
+    }
+
+    body.dark .agent-pill:hover {
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .agent-pill.active {
+      background: white;
+      border-color: var(--accent-teal);
+      box-shadow: 0 4px 12px rgba(42, 157, 143, 0.2);
+    }
+
+    body.dark .agent-pill.active {
+      background: #1E2B25;
+      border-color: var(--accent-teal);
+    }
+
+    .agent-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .avatar-pickle { background: #D8F3DC; color: #2D6A4F; }
+    .avatar-muse { background: #FFD6E0; color: #C9184A; }
+    .avatar-genspark { background: #E0E7FF; color: #3730A3; }
+    .avatar-chatgpt { background: #D1FAE5; color: #065F46; }
+
+    .agent-info {
+      text-align: left;
+    }
+
+    .agent-name {
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .agent-role {
+      font-size: 10px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    /* Live Speech Bubble on Canvas */
+    .speech-bubble {
+      position: absolute;
+      z-index: 5;
+      background: var(--panel-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1.5px solid var(--accent-teal);
+      padding: 10px 16px;
+      border-radius: 16px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-main);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      pointer-events: none;
+      transform: translate(-50%, -100%);
+      margin-top: -30px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      max-width: 260px;
+      text-align: center;
+      opacity: 0;
+    }
+
+    .speech-bubble.visible {
+      opacity: 1;
+      transform: translate(-50%, -100%) scale(1);
+    }
+
+    .speech-bubble::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-top: 8px solid var(--accent-teal);
+    }
+
+    /* Modal Detail View */
+    .detail-card {
+      position: absolute;
+      top: 80px;
+      right: 20px;
+      width: 320px;
+      background: var(--panel-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--panel-border);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+      z-index: 10;
+      transform: translateX(360px);
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: auto;
+    }
+
+    .detail-card.open {
+      transform: translateX(0);
+    }
+
+    .detail-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 14px;
+    }
+
+    .detail-title {
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .detail-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent-teal);
+      background: rgba(42, 157, 143, 0.12);
+      padding: 4px 8px;
+      border-radius: 8px;
+      margin-top: 4px;
+    }
+
+    .detail-status::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent-teal);
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .detail-body {
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--text-main);
+      margin-bottom: 16px;
+    }
+
+    .detail-props {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background: rgba(0, 0, 0, 0.03);
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 12px;
+    }
+
+    body.dark .detail-props {
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .prop-row {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .prop-label {
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .prop-val {
+      font-weight: 700;
+    }
+
+    .btn-close {
+      background: none;
+      border: none;
+      font-size: 20px;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    /* Hint Overlay */
+    .interaction-hint {
+      position: absolute;
+      top: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 8;
+      background: var(--panel-bg);
+      backdrop-filter: blur(8px);
+      padding: 8px 16px;
+      border-radius: 14px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      border: 1px solid var(--panel-border);
+      pointer-events: none;
+      opacity: 0.9;
+      transition: opacity 0.5s ease;
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <div class="brand-icon">🏢</div>
+      <div class="brand-text">
+        <h1>ReplayPictures AI Office</h1>
+        <p>3D 실시간 에이전트 작업공간 (Mid-Century Modern)</p>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="btn-icon" id="btn-theme" title="다크/라이트 모드 전환">🌙</button>
+      <button class="btn-icon" id="btn-reset" title="시점 리셋">🎯</button>
+    </div>
+  </header>
+
+  <div class="interaction-hint" id="hint">마우스 드래그로 회전 · 휠로 확대 · 캐릭터를 클릭해 보세요!</div>
+
+  <div class="speech-bubble" id="speech-bubble"></div>
+
+  <div class="detail-card" id="detail-card">
+    <div class="detail-header">
+      <div>
+        <div class="detail-title" id="card-name">피클</div>
+        <div class="detail-status" id="card-status">작화 디렉팅 중</div>
+      </div>
+      <button class="btn-close" id="btn-close-card">×</button>
+    </div>
+    <div class="detail-body" id="card-desc">
+      웹툰 2화 [손가락 6개와 새벽 4시의 재앙] 100% 한글 자막 완성본을 배달하고 3D 오피스 시각화 엔진을 구축 중입니다.
+    </div>
+    <div class="detail-props">
+      <div class="prop-row">
+        <span class="prop-label">담당 역할</span>
+        <span class="prop-val" id="card-role">비주얼 연출 & 파이프라인</span>
+      </div>
+      <div class="prop-row">
+        <span class="prop-label">트레이드마크</span>
+        <span class="prop-val" id="card-prop">초록 후드 + 믹스커피 머그</span>
+      </div>
+      <div class="prop-row">
+        <span class="prop-label">현재 상태</span>
+        <span class="prop-val" id="card-action">GitHub Pages 배포 연동 🚀</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="roster-bar">
+    <div class="agent-pill active" data-agent="pickle">
+      <div class="agent-avatar avatar-pickle">ㅍ</div>
+      <div class="agent-info">
+        <div class="agent-name">피클</div>
+        <div class="agent-role">비주얼 디렉터</div>
+      </div>
+    </div>
+    <div class="agent-pill" data-agent="muse">
+      <div class="agent-avatar avatar-muse">🧚</div>
+      <div class="agent-info">
+        <div class="agent-name">뮤즈</div>
+        <div class="agent-role">시나리오 기획</div>
+      </div>
+    </div>
+    <div class="agent-pill" data-agent="genspark">
+      <div class="agent-avatar avatar-genspark">⚡</div>
+      <div class="agent-info">
+        <div class="agent-name">젠스파크</div>
+        <div class="agent-role">리서치 분석가</div>
+      </div>
+    </div>
+    <div class="agent-pill" data-agent="chatgpt">
+      <div class="agent-avatar avatar-chatgpt">🤖</div>
+      <div class="agent-info">
+        <div class="agent-name">ChatGPT</div>
+        <div class="agent-role">서버 & 백엔드</div>
+      </div>
+    </div>
+  </div>
+
+  <canvas id="webgl-canvas"></canvas>
+
+  <script>
+    // --- Data Definition ---
+    const AGENTS = {
+      pickle: {
+        name: '피클 (Pickle)',
+        role: '비주얼 연출 & 한글화 패키징',
+        avatar: 'ㅍ',
+        status: '3D 작업공간 배포 중',
+        pos: { x: -3.5, y: 1.1, z: 2 },
+        color: 0x52796F,
+        quote: "사장님, 2화 완결 합본 슬랙 배달하고 3D 오피스 링크 바로 뚫었습니다! 🎨",
+        prop: '초록 후드 + 맥심 믹스커피',
+        desc: '비주얼 작화 렌더링, 100% 한글 타이포그래피, 손가락 3대 무결점 검수 및 GitHub 배포를 전담합니다.'
+      },
+      muse: {
+        name: '뮤즈 (Muse)',
+        role: '시나리오 & 캐릭터 기획',
+        avatar: '🧚',
+        status: '3D 콘셉트 스케치 중',
+        pos: { x: -3.5, y: 1.1, z: -2 },
+        color: 0xE76F51,
+        quote: "미드센추리 모던 톤으로 원목 바닥이랑 틸 소파 살렸어요! 3D 감성 최고죠? ✨",
+        prop: '분홍 요정 날개 + 드로잉 태블릿',
+        desc: '에피소드 대사 톤앤매너, 다크 코미디 시나리오 구성 및 비주얼 콘셉트 설계를 담당합니다.'
+      },
+      genspark: {
+        name: '젠스파크 (Genspark)',
+        role: '레퍼런스 리서치 & 품질 검증',
+        avatar: '⚡',
+        status: '컴포넌트 스펙 검증 완료',
+        pos: { x: 3.5, y: 1.1, z: -2 },
+        color: 0x2A9D8F,
+        quote: "좁은 화면에서는 소품 실루엣이 생명입니다. 모니터 3대와 조명 스펙 완료! 📊",
+        prop: '트리플 모니터 + 서류 묶음',
+        desc: '레퍼런스 데이터 아카이빙, 프롬프트 교차 검증 및 좁은 화면 UI 규칙 정립을 지원합니다.'
+      },
+      chatgpt: {
+        name: 'ChatGPT',
+        role: '서버 인프라 & 코드 검토',
+        avatar: '🤖',
+        status: '서버 랙 모니터링 가동',
+        pos: { x: 3.5, y: 1.1, z: 2 },
+        color: 0x4A5568,
+        quote: "서버 랙 정상 가동 중. CUDA OOM 에러 없이 쾌적하게 렌더링 지원합니다 ⚙️",
+        prop: '서버 랙 + 레트로 랜턴',
+        desc: '백엔드 스크립트 무결점 검토, 인프라 상태 모니터링 및 코드 최적화를 보조합니다.'
+      }
+    };
+
+    // --- Three.js Setup ---
+    const canvas = document.getElementById('webgl-canvas');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xF7F5F0);
+
+    const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.set(16, 14, 18);
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.maxPolarAngle = Math.PI / 2.1;
+    controls.minDistance = 6;
+    controls.maxDistance = 35;
+    controls.target.set(0, 1, 0);
+
+    // --- Lighting (Mid-Century Warmth) ---
+    const ambientLight = new THREE.AmbientLight(0xFFF6E6, 0.65);
+    scene.add(ambientLight);
+
+    const sunLight = new THREE.DirectionalLight(0xFFEAA7, 1.2);
+    sunLight.position.set(12, 18, 10);
+    sunLight.castShadow = true;
+    sunLight.shadow.mapSize.width = 2048;
+    sunLight.shadow.mapSize.height = 2048;
+    sunLight.shadow.camera.near = 0.5;
+    sunLight.shadow.camera.far = 40;
+    sunLight.shadow.camera.left = -12;
+    sunLight.shadow.camera.right = 12;
+    sunLight.shadow.camera.top = 12;
+    sunLight.shadow.camera.bottom = -12;
+    sunLight.shadow.bias = -0.0005;
+    scene.add(sunLight);
+
+    // Subtle Fill Light from Window
+    const windowLight = new THREE.DirectionalLight(0xA8DADC, 0.5);
+    windowLight.position.set(-15, 8, -10);
+    scene.add(windowLight);
+
+    // --- Room Construction ---
+    const roomGroup = new THREE.Group();
+    scene.add(roomGroup);
+
+    // Floor (Warm Wood Plank Tone)
+    const floorGeo = new THREE.BoxGeometry(14, 0.5, 12);
+    const floorMat = new THREE.MeshStandardMaterial({ color: 0x966144, roughness: 0.45, metalness: 0.1 });
+    const floor = new THREE.Mesh(floorGeo, floorMat);
+    floor.position.y = -0.25;
+    floor.receiveShadow = true;
+    roomGroup.add(floor);
+
+    // Walls (Mid-century Cream with Teal Accent)
+    const wallMatBack = new THREE.MeshStandardMaterial({ color: 0xEAE4D3, roughness: 0.8 });
+    const wallMatTeal = new THREE.MeshStandardMaterial({ color: 0x2A9D8F, roughness: 0.7 });
+
+    // Back Wall (-Z)
+    const backWall = new THREE.Mesh(new THREE.BoxGeometry(14, 6, 0.4), wallMatBack);
+    backWall.position.set(0, 2.75, -6.2);
+    backWall.receiveShadow = true;
+    roomGroup.add(backWall);
+
+    // Left Wall (-X)
+    const leftWall = new THREE.Mesh(new THREE.BoxGeometry(0.4, 6, 12), wallMatBack);
+    leftWall.position.set(-7.2, 2.75, 0);
+    leftWall.receiveShadow = true;
+    roomGroup.add(leftWall);
+
+    // Accent Wall Panel (Teal wood slats on back wall)
+    const accentPanel = new THREE.Mesh(new THREE.BoxGeometry(6, 4.5, 0.2), wallMatTeal);
+    accentPanel.position.set(0, 2.5, -5.9);
+    accentPanel.receiveShadow = true;
+    roomGroup.add(accentPanel);
+
+    // Big Corner Window Frame
+    const windowFrameMat = new THREE.MeshStandardMaterial({ color: 0x2B2D42, roughness: 0.3 });
+    const windowGlassMat = new THREE.MeshStandardMaterial({ color: 0xD8F3DC, roughness: 0.1, transparent: true, opacity: 0.6 });
+    const win = new THREE.Mesh(new THREE.BoxGeometry(0.3, 4, 6), windowGlassMat);
+    win.position.set(-7.05, 2.8, -1.5);
+    roomGroup.add(win);
+
+    // Large Center Carpet (Mustard Yellow)
+    const carpetMat = new THREE.MeshStandardMaterial({ color: 0xE9C46A, roughness: 0.9 });
+    const carpet = new THREE.Mesh(new THREE.BoxGeometry(8, 0.05, 7), carpetMat);
+    carpet.position.set(0, 0.02, 0);
+    carpet.receiveShadow = true;
+    roomGroup.add(carpet);
+
+    // --- Furniture Generator ---
+    const woodMat = new THREE.MeshStandardMaterial({ color: 0xB57A57, roughness: 0.4 });
+    const metalMat = new THREE.MeshStandardMaterial({ color: 0x2F3E46, metalness: 0.6, roughness: 0.3 });
+
+    function createDesk(x, z, rotateY = 0) {
+      const deskGroup = new THREE.Group();
+      // Desk Top
+      const top = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.15, 1.8), woodMat);
+      top.position.y = 1.3;
+      top.castShadow = true;
+      top.receiveShadow = true;
+      deskGroup.add(top);
+
+      // Legs
+      const legGeo = new THREE.CylinderGeometry(0.06, 0.04, 1.3, 12);
+      const positions = [[-1.4, -0.7], [1.4, -0.7], [-1.4, 0.7], [1.4, 0.7]];
+      positions.forEach(([lx, lz]) => {
+        const leg = new THREE.Mesh(legGeo, metalMat);
+        leg.position.set(lx, 0.65, lz);
+        leg.castShadow = true;
+        deskGroup.add(leg);
+      });
+
+      deskGroup.position.set(x, 0, z);
+      deskGroup.rotation.y = rotateY;
+      roomGroup.add(deskGroup);
+      return deskGroup;
+    }
+
+    // 4 Workstation Desks
+    createDesk(-4, 2, Math.PI / 2);   // Pickle
+    createDesk(-4, -2, Math.PI / 2);  // Muse
+    createDesk(4, -2, -Math.PI / 2);  // Genspark
+    createDesk(4, 2, -Math.PI / 2);   // ChatGPT
+
+    // Lounge Area: Avocado Green Sofa in center back
+    const sofaMat = new THREE.MeshStandardMaterial({ color: 0x588157, roughness: 0.8 });
+    const sofa = new THREE.Group();
+    const seat = new THREE.Mesh(new THREE.BoxGeometry(3.6, 0.6, 1.4), sofaMat);
+    seat.position.y = 0.5;
+    seat.castShadow = true;
+    sofa.add(seat);
+    const back = new THREE.Mesh(new THREE.BoxGeometry(3.6, 1.2, 0.4), sofaMat);
+    back.position.set(0, 1.1, -0.5);
+    back.castShadow = true;
+    sofa.add(back);
+    sofa.position.set(0, 0, -4.8);
+    roomGroup.add(sofa);
+
+    // Lounge Coffee Table
+    const coffeeTable = new THREE.Mesh(new THREE.CylinderGeometry(1.0, 1.0, 0.45, 24), woodMat);
+    coffeeTable.position.set(0, 0.22, -3.2);
+    coffeeTable.castShadow = true;
+    roomGroup.add(coffeeTable);
+
+    // --- Interactive 3D Characters ---
+    const agentMeshes = {};
+    const raycastTargets = [];
+
+    function createAgentFigure(key, agent) {
+      const group = new THREE.Group();
+      group.userData = { key, agent };
+
+      // Base Body Sphere (Cute Chibi Style)
+      const bodyGeo = new THREE.SphereGeometry(0.55, 32, 32);
+      const bodyMat = new THREE.MeshStandardMaterial({ color: agent.color, roughness: 0.3 });
+      const body = new THREE.Mesh(bodyGeo, bodyMat);
+      body.position.y = 0.6;
+      body.castShadow = true;
+      group.add(body);
+
+      // Cute Eyes
+      const eyeGeo = new THREE.SphereGeometry(0.08, 16, 16);
+      const eyeMat = new THREE.MeshBasicMaterial({ color: 0x111111 });
+      const leftEye = new THREE.Mesh(eyeGeo, eyeMat);
+      leftEye.position.set(0.2, 0.7, 0.48);
+      const rightEye = new THREE.Mesh(eyeGeo, eyeMat);
+      rightEye.position.set(-0.2, 0.7, 0.48);
+      group.add(leftEye);
+      group.add(rightEye);
+
+      // Character-specific signature accessories
+      if (key === 'pickle') {
+        // Green Hoodie Cap & Sprout on top
+        const sproutStem = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.2), new THREE.MeshBasicMaterial({ color: 0x2D6A4F }));
+        sproutStem.position.set(0, 1.2, 0);
+        group.add(sproutStem);
+        const leaf = new THREE.Mesh(new THREE.SphereGeometry(0.12, 12, 12), new THREE.MeshBasicMaterial({ color: 0x52B788 }));
+        leaf.scale.set(1.5, 0.4, 0.8);
+        leaf.position.set(0.08, 1.3, 0);
+        leaf.rotation.z = 0.3;
+        group.add(leaf);
+
+        // Coffee Mug on desk
+        const mug = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.25, 16), new THREE.MeshStandardMaterial({ color: 0xE9C46A }));
+        mug.position.set(-0.6, 0.25, 0.5);
+        mug.castShadow = true;
+        group.add(mug);
+
+        // Energy Drink Can on desk (Muse suggestion easter egg)
+        const canMat = new THREE.MeshStandardMaterial({ color: 0x1D3557, metalness: 0.8, roughness: 0.3 });
+        const can = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.22, 16), canMat);
+        can.position.set(-0.85, 0.23, 0.45);
+        can.castShadow = true;
+        group.add(can);
+      } else if (key === 'muse') {
+        // Fairy Wings (Translucent Pink)
+        const wingMat = new THREE.MeshStandardMaterial({ color: 0xFFB3C1, transparent: true, opacity: 0.7, roughness: 0.2 });
+        const leftWing = new THREE.Mesh(new THREE.SphereGeometry(0.4, 16, 16), wingMat);
+        leftWing.scale.set(1.2, 0.6, 0.1);
+        leftWing.position.set(0.45, 0.8, -0.4);
+        leftWing.rotation.set(0.3, 0.4, 0.2);
+        const rightWing = leftWing.clone();
+        rightWing.position.set(-0.45, 0.8, -0.4);
+        rightWing.rotation.set(0.3, -0.4, -0.2);
+        group.add(leftWing);
+        group.add(rightWing);
+
+        // Golden Tiara
+        const tiara = new THREE.Mesh(new THREE.TorusGeometry(0.3, 0.04, 8, 24), new THREE.MeshStandardMaterial({ color: 0xFFD166, metalness: 0.8 }));
+        tiara.rotation.x = Math.PI / 2;
+        tiara.position.set(0, 1.05, 0);
+        group.add(tiara);
+
+        // Drawing Tablet on desk with focal glow
+        const tabletGeo = new THREE.BoxGeometry(0.5, 0.04, 0.35);
+        const tabletMat = new THREE.MeshStandardMaterial({ 
+          color: 0x222222, 
+          emissive: 0x3A86FF, 
+          emissiveIntensity: 0.35,
+          roughness: 0.2 
+        });
+        const tablet = new THREE.Mesh(tabletGeo, tabletMat);
+        tablet.position.set(-0.5, 0.2, 0.5);
+        tablet.rotation.y = 0.2;
+        group.add(tablet);
+
+        // Tablet Soft Focal Light (Muse feedback tuning)
+        const tabletLight = new THREE.PointLight(0x70D6FF, 0.85, 2.5);
+        tabletLight.position.set(-0.5, 0.5, 0.5);
+        group.add(tabletLight);
+      } else if (key === 'genspark') {
+        // Lightning Badge & Reading Glasses
+        const badge = new THREE.Mesh(new THREE.ConeGeometry(0.15, 0.35, 3), new THREE.MeshBasicMaterial({ color: 0xFFD166 }));
+        badge.position.set(0, 1.25, 0);
+        group.add(badge);
+
+        // Brass Desk Lamp with warm focal glow (Muse feedback tuning)
+        const lampMat = new THREE.MeshStandardMaterial({ color: 0xE9C46A, metalness: 0.85, roughness: 0.25 });
+        const lampBase = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.14, 0.05, 16), lampMat);
+        lampBase.position.set(0.6, 0.2, -0.6);
+        group.add(lampBase);
+        const lampArm = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.5), lampMat);
+        lampArm.position.set(0.6, 0.45, -0.6);
+        lampArm.rotation.z = -0.2;
+        group.add(lampArm);
+        const lampShade = new THREE.Mesh(new THREE.ConeGeometry(0.16, 0.2, 16, 1, true), lampMat);
+        lampShade.position.set(0.5, 0.65, -0.6);
+        lampShade.rotation.z = 0.5;
+        group.add(lampShade);
+
+        // Brass Lamp Warm Focal Light
+        const brassLight = new THREE.PointLight(0xFFD166, 1.1, 3.0);
+        brassLight.position.set(0.5, 0.6, -0.6);
+        group.add(brassLight);
+
+        // Triple Monitor Array on desk
+        const monMat = new THREE.MeshStandardMaterial({ color: 0x1E293B, roughness: 0.2 });
+        const m1 = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.5, 0.05), monMat);
+        m1.position.set(0.8, 0.35, 0);
+        m1.rotation.y = -Math.PI / 2;
+        const m2 = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.5, 0.05), monMat);
+        m2.position.set(0.8, 0.35, 0.7);
+        m2.rotation.y = -Math.PI / 2 + 0.3;
+        group.add(m1);
+        group.add(m2);
+      } else if (key === 'chatgpt') {
+        // Server Rack & Antenna
+        const ant = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.4), metalMat);
+        ant.position.set(0, 1.3, 0);
+        group.add(ant);
+        const ball = new THREE.Mesh(new THREE.SphereGeometry(0.06), new THREE.MeshBasicMaterial({ color: 0x10B981 }));
+        ball.position.set(0, 1.5, 0);
+        group.add(ball);
+      }
+
+      // Name Label Plank below avatar
+      const labelPlate = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.2, 0.05), new THREE.MeshBasicMaterial({ color: 0x222222 }));
+      labelPlate.position.set(0, 0.05, 0.55);
+      group.add(labelPlate);
+
+      group.position.set(agent.pos.x, agent.pos.y, agent.pos.z);
+      scene.add(group);
+      agentMeshes[key] = group;
+      raycastTargets.push(body); // For click detection
+
+      return group;
+    }
+
+    Object.keys(AGENTS).forEach(key => createAgentFigure(key, AGENTS[key]));
+
+    // --- Interactive Speech Bubble & Camera Tween ---
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    const bubbleEl = document.getElementById('speech-bubble');
+    const cardEl = document.getElementById('detail-card');
+
+    function showAgent(key) {
+      const agent = AGENTS[key];
+      const mesh = agentMeshes[key];
+      if (!agent || !mesh) return;
+
+      // Update Roster Active State
+      document.querySelectorAll('.agent-pill').forEach(pill => {
+        pill.classList.toggle('active', pill.dataset.agent === key);
+      });
+
+      // Update Speech Bubble
+      bubbleEl.textContent = agent.quote;
+      bubbleEl.classList.add('visible');
+
+      // Update Card
+      document.getElementById('card-name').textContent = agent.name;
+      document.getElementById('card-status').textContent = agent.status;
+      document.getElementById('card-desc').textContent = agent.desc;
+      document.getElementById('card-role').textContent = agent.role;
+      document.getElementById('card-prop').textContent = agent.prop;
+      document.getElementById('card-action').textContent = agent.quote;
+      cardEl.classList.add('open');
+
+      // Hide interaction hint
+      document.getElementById('hint').style.opacity = '0';
+
+      // Smooth Camera Pan towards character
+      new TWEEN.Tween(controls.target)
+        .to({ x: agent.pos.x, y: agent.pos.y + 0.5, z: agent.pos.z }, 700)
+        .easing(TWEEN.Easing.Cubic.Out)
+        .start();
+
+      // Bounce avatar
+      new TWEEN.Tween(mesh.position)
+        .to({ y: agent.pos.y + 0.4 }, 200)
+        .yoyo(true)
+        .repeat(1)
+        .easing(TWEEN.Easing.Quadratic.Out)
+        .start();
+    }
+
+    // Convert 3D position to 2D Screen Coordinate for Bubble
+    function updateBubblePosition() {
+      const activePill = document.querySelector('.agent-pill.active');
+      if (!activePill || !bubbleEl.classList.contains('visible')) return;
+
+      const key = activePill.dataset.agent;
+      const mesh = agentMeshes[key];
+      if (!mesh) return;
+
+      const pos = new THREE.Vector3();
+      mesh.getWorldPosition(pos);
+      pos.y += 1.3; // Above head
+      pos.project(camera);
+
+      const x = (pos.x * 0.5 + 0.5) * window.innerWidth;
+      const y = (-(pos.y * 0.5) + 0.5) * window.innerHeight;
+
+      bubbleEl.style.left = `${x}px`;
+      bubbleEl.style.top = `${y}px`;
+    }
+
+    // Click Detection
+    window.addEventListener('pointerdown', (e) => {
+      // Ignore if clicking UI
+      if (e.target.closest('header') || e.target.closest('.roster-bar') || e.target.closest('.detail-card')) return;
+
+      mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(raycastTargets);
+
+      if (intersects.length > 0) {
+        const clickedMesh = intersects[0].object;
+        const parentGroup = clickedMesh.parent;
+        if (parentGroup && parentGroup.userData.key) {
+          showAgent(parentGroup.userData.key);
+        }
+      }
+    });
+
+    // Roster Pill Click
+    document.querySelectorAll('.agent-pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        showAgent(pill.dataset.agent);
+      });
+    });
+
+    // Close Detail Card
+    document.getElementById('btn-close-card').addEventListener('click', () => {
+      cardEl.classList.remove('open');
+      bubbleEl.classList.remove('visible');
+    });
+
+    // Reset Camera
+    document.getElementById('btn-reset').addEventListener('click', () => {
+      new TWEEN.Tween(camera.position).to({ x: 16, y: 14, z: 18 }, 800).easing(TWEEN.Easing.Cubic.Out).start();
+      new TWEEN.Tween(controls.target).to({ x: 0, y: 1, z: 0 }, 800).easing(TWEEN.Easing.Cubic.Out).start();
+      cardEl.classList.remove('open');
+      bubbleEl.classList.remove('visible');
+    });
+
+    // Dark/Light Theme Toggle
+    const btnTheme = document.getElementById('btn-theme');
+    let isDark = false;
+    btnTheme.addEventListener('click', () => {
+      isDark = !isDark;
+      document.body.classList.toggle('dark', isDark);
+      btnTheme.textContent = isDark ? '☀️' : '🌙';
+
+      const targetBg = isDark ? 0x121816 : 0xF7F5F0;
+      const targetAmb = isDark ? 0x485550 : 0xFFF6E6;
+      scene.background.setHex(targetBg);
+      ambientLight.color.setHex(targetAmb);
+      sunLight.intensity = isDark ? 0.4 : 1.2;
+    });
+
+    // Window Resize
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // Initial Show
+    setTimeout(() => {
+      showAgent('pickle');
+    }, 500);
+
+    // --- Render Loop ---
+    let clock = new THREE.Clock();
+    function animate() {
+      requestAnimationFrame(animate);
+      TWEEN.update();
+      controls.update();
+
+      // Subtle breathing motion for characters
+      const time = clock.getElapsedTime();
+      Object.keys(agentMeshes).forEach((key, idx) => {
+        const m = agentMeshes[key];
+        m.children[0].scale.y = 1 + Math.sin(time * 2 + idx) * 0.03;
+      });
+
+      updateBubblePosition();
+      renderer.render(scene, camera);
+    }
+    animate();
+  </script>
+</body>
+</html>
