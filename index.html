@@ -73,26 +73,6 @@
       image-rendering: crisp-edges;
     }
 
-    /* Retro CRT Scanline & Dot Matrix Overlay */
-    .scanlines {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      pointer-events: none;
-      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.16) 50%),
-                  linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-      background-size: 100% 4px, 6px 100%;
-      z-index: 5;
-      opacity: 0.85;
-      transition: opacity 0.3s ease;
-    }
-
-    .scanlines.off {
-      opacity: 0;
-    }
-
     /* Retro 8-bit Pixel Header UI */
     header {
       position: fixed;
@@ -390,13 +370,41 @@
     }
 
     @media (max-width: 640px) {
-      .header-box { padding: 8px 12px; }
-      .brand-title { font-size: 14px; }
+      header {
+        top: 8px;
+        left: 8px;
+        right: 8px;
+        gap: 6px;
+      }
+      .header-box {
+        padding: 6px 10px;
+        gap: 6px;
+      }
+      .logo-badge {
+        font-size: 16px;
+        width: 28px;
+        height: 28px;
+      }
+      .brand-title {
+        font-size: 13px;
+        gap: 4px;
+      }
+      .tag-live {
+        font-size: 9px;
+        padding: 2px 4px;
+      }
       .brand-sub { display: none; }
+      .nav-controls {
+        gap: 4px;
+      }
+      .btn-pixel {
+        padding: 6px 8px;
+        font-size: 11px;
+        white-space: nowrap;
+      }
       .roster-bar { bottom: 10px; padding: 6px 8px; gap: 6px; }
       .agent-pill { padding: 5px 8px; font-size: 12px; }
       .detail-card { width: calc(100vw - 24px); right: 12px; top: 76px; }
-      .btn-pixel { padding: 6px 10px; font-size: 12px; }
     }
   </style>
 
@@ -405,9 +413,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>
 </head>
 <body>
-  <!-- Retro CRT Scanline & Dot Matrix Texture -->
-  <div class="scanlines" id="scanlines"></div>
-
   <!-- Top Retro Bar -->
   <header>
     <div class="header-box">
@@ -423,7 +428,6 @@
 
     <div class="nav-controls">
       <button id="btn-pixel" class="btn-pixel" title="도트 크기 변경">👾 도트: 3.5x</button>
-      <button id="btn-crt" class="btn-pixel" title="CRT 스캔라인 켜기/끄기">📺 CRT</button>
       <button id="btn-reset" class="btn-pixel" title="카메라 위치 초기화">🏠 리셋</button>
       <button id="btn-theme" class="btn-pixel" title="라이트/다크 모드">🌙</button>
     </div>
@@ -988,16 +992,6 @@
       pixelScale = pixelModes[pixelModeIdx].scale;
       btnPixel.textContent = pixelModes[pixelModeIdx].label;
       updateRendererSize();
-    });
-
-    // CRT Scanline Toggle
-    const btnCrt = document.getElementById('btn-crt');
-    const scanlines = document.getElementById('scanlines');
-    let crtOn = true;
-    btnCrt.addEventListener('click', () => {
-      crtOn = !crtOn;
-      scanlines.classList.toggle('off', !crtOn);
-      btnCrt.style.background = crtOn ? 'var(--panel-bg)' : '#CBD5E0';
     });
 
     // Theme Toggle
