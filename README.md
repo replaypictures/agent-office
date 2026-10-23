@@ -1,11 +1,34 @@
-# ReplayPictures AI Agent Office 🏢
+# ReplayPictures 2D AI Agent Office 🏢 (Gather Style)
 
-3D interactive miniature workspace for ReplayPictures AI Agents (Pickle, Muse, Genspark, ChatGPT).
+사장님의 "이런 2D로 가자" 레퍼런스(게더타운 / 탑다운 픽셀 RPG 스타일)를 100% 반영하여, Three.js 3D 엔진을 전면 걷어내고 초경량 2D 탑다운 픽셀아트 인터랙티브 오피스로 전격 개편한 웹 작업실입니다.
 
-![Preview](preview.png)
+![ReplayPictures 2D AI Agent Office](preview.png)
 
-- **Engine**: Built with Three.js & OrbitControls
-- **2.5D Toon & Pixel Art**: Real-time cel-shading with `MeshToonMaterial`, dynamic black cartoon outline, and downscaled pixelation buffer (`image-rendering: pixelated`)
-- **Interactive 360°**: Camera orbit, pan & zoom
-- **Clickable Agents**: Workstations with retro 8-bit status cards & dialog bubbles (Pickle, Muse, Genspark, ChatGPT)
-- **Retro Controls**: Real-time pixel size toggle (`2x` / `3.5x` / `5x`), CRT scanline filter toggle, and Light/Dark mode
+## 🎮 주요 기능 및 특징
+
+1. **게더타운 / 16-bit 쯔꾸르 스타일 2D 픽셀 오피스 맵**
+   - 회의실 (8인 대형 테이블 & 스크린)
+   - 업무용 데스크 구역 (에이전트 4인 워크스테이션)
+   - 탕비실 (싱크대, 커피머신, 냉장고, 정수기, 4인 티테이블)
+   - 휴게 라운지 (고급 러그, 3면 소파, 커피테이블)
+
+2. **5인 2D 픽셀 캐릭터**
+   - 🥒 **피클 (Pickle)**: 비주얼 작화 & 2D 웹 인터랙션 (초록 후드 + 맥심 믹스커피)
+   - 🧚‍♀️ **뮤즈 (Muse)**: 스토리 콘티 & 대사 디렉팅 (라벤더 후드 + 스타일러스 태블릿)
+   - ⚡ **젠스파크 (Genspark)**: 실시간 데이터 & 강사 공고 모니터링 (스마트 글래스 + 피드)
+   - 🤖 **ChatGPT**: 서버 백엔드 & 로직 분석 (CRT 터미널 헤드 + 안테나)
+   - 👤 **사장님 (J주일)**: 리플레이픽처스 총괄 디렉터 (네이비 재킷 + 스마트폰)
+
+3. **인터랙티브 기능**
+   - **사장님 아바타 조작**: 화면 클릭/터치 이동, 키보드 방향키(WASD), 모바일 온스크린 가상 D-Pad
+   - **근접 인터랙션**: 에이전트 근처로 다가가면 효과음과 함께 전용 환영 말풍선 팝업
+   - **팀 모드 버튼**:
+     - `[🏢 전원 데스크]`: 각자 업무 자리로 복귀
+     - `[📊 회의 소집]`: 회의실 테이블로 전원 이동
+     - `[☕ 탕비실 티타임]`: 탕비실로 모여 믹스커피 & 티타임
+     - `[🛋️ 휴게 라운지]`: 소파로 이동해 마감 휴식
+   - **8-bit 레트로 사운드**: Web Audio API 기반 효과음 (발걸음, 클릭, 차임, 팡파르)
+
+4. **모바일 최적화**
+   - 3D WebGL 오버헤드 0%, 배터리 소모 및 발열 제로
+   - 화면 자동 맞춤 & 핀치 줌 / 드래그 패닝 지원

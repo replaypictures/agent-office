@@ -3,1035 +3,1252 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>ReplayPictures AI Agent Office 🏢 (2.5D Toon & Dot Graphic)</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <title>ReplayPictures 2D AI Agent Office 🏢 (Gather Style)</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/galmuri/dist/galmuri.css">
   <style>
-    @font-face {
-      font-family: 'DungGeunMo';
-      src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/DungGeunMo.woff') format('woff');
-      font-weight: normal;
-      font-style: normal;
-    }
-
-    :root {
-      --bg-cream: #F5EFE6;
-      --bg-dark: #101413;
-      --text-main: #1A202C;
-      --text-muted: #4A5568;
-      --accent-teal: #1F7A6E;
-      --accent-mustard: #D9A036;
-      --accent-orange: #D95338;
-      --accent-green: #386641;
-      --wood: #783E2D;
-      --panel-bg: rgba(255, 255, 255, 0.94);
-      --panel-border: #1A1A1A;
-      --pixel-shadow: 4px 4px 0px #1A1A1A;
-      --pixel-shadow-sm: 2px 2px 0px #1A1A1A;
-    }
-
-    body.dark {
-      --bg-cream: #101413;
-      --text-main: #F7FAFC;
-      --text-muted: #CBD5E0;
-      --panel-bg: rgba(20, 26, 24, 0.95);
-      --panel-border: #000000;
-      --pixel-shadow: 4px 4px 0px #000000;
-      --pixel-shadow-sm: 2px 2px 0px #000000;
-    }
-
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      -webkit-tap-highlight-color: transparent;
       user-select: none;
-      -webkit-user-select: none;
     }
-
-    body {
-      background-color: var(--bg-cream);
-      color: var(--text-main);
+    body, html {
+      width: 100%;
+      height: 100%;
       overflow: hidden;
-      width: 100vw;
-      height: 100vh;
-      font-family: 'DungGeunMo', 'Pretendard', sans-serif;
-      transition: background-color 0.3s ease;
+      background-color: #14161d;
+      font-family: 'Galmuri11', 'Galmuri9', monospace, sans-serif;
+      color: #fff;
+    }
+    
+    #game-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      cursor: crosshair;
+      touch-action: none;
     }
 
-    /* Hardware Pixel Art Rendering on 3D Canvas */
-    #webgl-canvas {
-      position: fixed;
+    canvas#office-canvas {
+      position: absolute;
       top: 0;
       left: 0;
-      width: 100vw !important;
-      height: 100vh !important;
-      display: block;
-      z-index: 1;
       image-rendering: pixelated;
-      image-rendering: -moz-crisp-edges;
       image-rendering: crisp-edges;
     }
 
-    /* Retro 8-bit Pixel Header UI */
+    /* Top Navigation Bar */
     header {
-      position: fixed;
-      top: 14px;
-      left: 16px;
-      right: 16px;
-      z-index: 10;
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      right: 12px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       pointer-events: none;
+      z-index: 100;
+      gap: 8px;
     }
 
-    .header-box {
-      background: var(--panel-bg);
-      border: 3px solid var(--panel-border);
-      box-shadow: var(--pixel-shadow);
-      padding: 10px 18px;
+    .brand-badge {
       pointer-events: auto;
+      background: rgba(20, 22, 29, 0.92);
+      border: 3px solid #f1c40f;
+      box-shadow: 4px 4px 0 #000;
+      padding: 6px 12px;
+      border-radius: 4px;
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 8px;
     }
-
-    .logo-badge {
-      font-size: 24px;
-      animation: floatBadge 2s ease-in-out infinite alternate;
+    .brand-badge .icon {
+      font-size: 1.2rem;
     }
-
-    @keyframes floatBadge {
-      0% { transform: translateY(0px); }
-      100% { transform: translateY(-4px); }
-    }
-
     .brand-title {
-      font-size: 17px;
-      font-weight: 800;
+      font-size: 0.95rem;
+      font-weight: bold;
+      color: #f1c40f;
       letter-spacing: -0.5px;
-      color: var(--text-main);
-      display: flex;
-      align-items: center;
-      gap: 8px;
     }
-
-    .tag-live {
-      font-family: 'DungGeunMo', monospace;
-      font-size: 11px;
-      font-weight: normal;
-      background: #E76F51;
-      color: #FFF;
-      padding: 3px 6px;
-      border: 2px solid #1A1A1A;
-      box-shadow: 2px 2px 0px #1A1A1A;
-      letter-spacing: 0px;
-    }
-
     .brand-sub {
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-top: 2px;
+      font-size: 0.7rem;
+      color: #a5b1c2;
     }
 
-    .nav-controls {
-      display: flex;
-      gap: 8px;
+    .header-actions {
       pointer-events: auto;
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
     }
 
-    .btn-pixel {
-      background: var(--panel-bg);
-      border: 3px solid var(--panel-border);
-      box-shadow: var(--pixel-shadow);
-      color: var(--text-main);
-      padding: 8px 14px;
+    .retro-btn {
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: bold;
+      padding: 6px 10px;
+      background: #2c3e50;
+      color: #ecf0f1;
+      border: 2px solid #000;
+      box-shadow: 3px 3px 0 #000;
+      border-radius: 3px;
       cursor: pointer;
-      font-family: 'DungGeunMo', sans-serif;
-      font-size: 13px;
-      font-weight: 700;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
       transition: all 0.1s;
     }
-
-    .btn-pixel:hover {
-      transform: translate(-1px, -1px);
-      box-shadow: 5px 5px 0px var(--panel-border);
-      background: #FFF;
-    }
-
-    .btn-pixel:active {
+    .retro-btn:active {
       transform: translate(2px, 2px);
-      box-shadow: 1px 1px 0px var(--panel-border);
+      box-shadow: 1px 1px 0 #000;
+    }
+    .retro-btn.primary {
+      background: #e67e22;
+      color: #fff;
+    }
+    .retro-btn.success {
+      background: #27ae60;
+      color: #fff;
+    }
+    .retro-btn.active {
+      background: #f1c40f;
+      color: #000;
     }
 
-    /* Bottom Character Roster Bar */
-    .roster-bar {
-      position: fixed;
-      bottom: 18px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 10;
-      display: flex;
-      gap: 10px;
-      background: var(--panel-bg);
-      border: 3px solid var(--panel-border);
-      box-shadow: var(--pixel-shadow);
-      padding: 8px 14px;
-      pointer-events: auto;
-      max-width: 95vw;
-      overflow-x: auto;
-    }
-
-    .agent-pill {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 7px 14px;
-      border: 2px solid transparent;
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--text-muted);
-      white-space: nowrap;
-      transition: all 0.15s;
-    }
-
-    .agent-pill:hover {
-      color: var(--text-main);
-      background: rgba(0, 0, 0, 0.05);
-    }
-
-    .agent-pill.active {
-      color: #FFF;
-      background: var(--accent-teal);
-      border: 2px solid #1A1A1A;
-      box-shadow: var(--pixel-shadow-sm);
-    }
-
-    .agent-pill.pickle.active { background: #2D6A4F; }
-    .agent-pill.muse.active { background: #D90429; }
-    .agent-pill.genspark.active { background: #D9A036; color: #1A1A1A; }
-    .agent-pill.chatgpt.active { background: #2B2D42; }
-
-    /* Pixel Speech Bubble */
-    .speech-bubble {
-      position: fixed;
-      z-index: 15;
-      background: #FFF;
-      color: #1A1A1A;
-      border: 3px solid #1A1A1A;
-      box-shadow: var(--pixel-shadow);
-      padding: 10px 16px;
-      font-size: 14px;
-      font-weight: bold;
-      pointer-events: none;
-      transform: translate(-50%, -100%) translateY(-24px);
-      max-width: 320px;
-      line-height: 1.45;
-      opacity: 0;
-      transition: opacity 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), transform 0.2s ease;
-      white-space: normal;
-    }
-
-    .speech-bubble::after {
-      content: '';
+    /* Bottom Quick Action Bar */
+    .bottom-bar {
       position: absolute;
-      bottom: -10px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 0;
-      height: 0;
-      border-left: 8px solid transparent;
-      border-right: 8px solid transparent;
-      border-top: 10px solid #1A1A1A;
-    }
-
-    .speech-bubble.visible {
-      opacity: 1;
-      transform: translate(-50%, -100%) translateY(-28px);
-    }
-
-    /* Agent Detail Side Card (8-bit RPG Style) */
-    .detail-card {
-      position: fixed;
-      top: 86px;
-      right: 18px;
-      width: 330px;
-      max-width: calc(100vw - 36px);
-      background: var(--panel-bg);
-      border: 3px solid var(--panel-border);
-      box-shadow: var(--pixel-shadow);
-      padding: 18px;
-      z-index: 10;
-      pointer-events: auto;
-      transform: translateX(380px);
-      transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
-    }
-
-    .detail-card.open {
-      transform: translateX(0);
-    }
-
-    .card-header {
+      bottom: 12px;
+      left: 12px;
+      right: 12px;
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      border-bottom: 2px dashed var(--panel-border);
-      padding-bottom: 10px;
-      margin-bottom: 12px;
+      align-items: flex-end;
+      pointer-events: none;
+      z-index: 100;
+      gap: 8px;
     }
 
-    .card-title {
-      font-size: 17px;
-      font-weight: 800;
+    .team-modes {
+      pointer-events: auto;
+      display: flex;
+      gap: 6px;
+      background: rgba(20, 22, 29, 0.92);
+      border: 2px solid #000;
+      box-shadow: 4px 4px 0 #000;
+      padding: 6px;
+      border-radius: 4px;
+      overflow-x: auto;
+      max-width: 100%;
+    }
+
+    .agent-selectors {
+      pointer-events: auto;
+      display: flex;
+      gap: 6px;
+      background: rgba(20, 22, 29, 0.92);
+      border: 2px solid #000;
+      box-shadow: 4px 4px 0 #000;
+      padding: 6px;
+      border-radius: 4px;
+    }
+    .agent-pill {
+      font-family: inherit;
+      font-size: 0.75rem;
+      padding: 5px 8px;
+      background: #34495e;
+      color: #fff;
+      border: 2px solid #000;
+      border-radius: 3px;
+      cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
+      box-shadow: 2px 2px 0 #000;
+    }
+    .agent-pill:active {
+      transform: translate(1px, 1px);
+      box-shadow: 1px 1px 0 #000;
+    }
+    .agent-pill.pickle { border-color: #2ecc71; color: #2ecc71; }
+    .agent-pill.muse { border-color: #e056fd; color: #e056fd; }
+    .agent-pill.genspark { border-color: #f1c40f; color: #f1c40f; }
+    .agent-pill.chatgpt { border-color: #00d2d3; color: #00d2d3; }
+
+    /* Side Detail Drawer (Retro RPG Dialog Card) */
+    #detail-drawer {
+      position: absolute;
+      top: 60px;
+      right: 14px;
+      width: 320px;
+      max-width: calc(100% - 28px);
+      background: rgba(26, 28, 38, 0.96);
+      border: 3px solid #f1c40f;
+      box-shadow: 6px 6px 0 #000;
+      border-radius: 6px;
+      padding: 14px;
+      z-index: 200;
+      display: none;
+      pointer-events: auto;
+    }
+    #detail-drawer.open {
+      display: block;
+      animation: popIn 0.15s ease-out;
+    }
+    @keyframes popIn {
+      from { transform: scale(0.92); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
     }
 
-    .card-close {
-      background: #E76F51;
-      color: #FFF;
-      border: 2px solid #1A1A1A;
-      box-shadow: 2px 2px 0px #1A1A1A;
-      width: 28px;
-      height: 28px;
+    .drawer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 10px;
+      border-bottom: 2px dashed #4b4b4b;
+      padding-bottom: 8px;
+    }
+    .drawer-title-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .drawer-avatar-preview {
+      width: 44px;
+      height: 44px;
+      background: #111;
+      border: 2px solid #f1c40f;
+      border-radius: 4px;
       display: flex;
       align-items: center;
       justify-content: center;
-      cursor: pointer;
+      overflow: hidden;
+      image-rendering: pixelated;
+    }
+    .drawer-avatar-preview img {
+      max-width: 90%;
+      max-height: 90%;
+      image-rendering: pixelated;
+    }
+    .drawer-name {
+      font-size: 1rem;
       font-weight: bold;
-      font-size: 15px;
+      color: #fff;
+    }
+    .drawer-role {
+      font-size: 0.75rem;
+      color: #f1c40f;
+    }
+    .close-btn {
+      background: #c0392b;
+      color: #fff;
+      border: 2px solid #000;
+      box-shadow: 2px 2px 0 #000;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      cursor: pointer;
+      font-family: inherit;
     }
 
-    .card-status {
-      display: inline-block;
-      font-size: 11px;
-      padding: 3px 8px;
-      background: #52B788;
-      color: #FFF;
-      border: 2px solid #1A1A1A;
-      box-shadow: 2px 2px 0px #1A1A1A;
+    .drawer-body {
+      font-size: 0.8rem;
+      line-height: 1.45;
+      color: #dcdde1;
       margin-bottom: 12px;
     }
-
-    .card-desc {
-      font-family: 'Pretendard', sans-serif;
-      font-size: 13px;
-      line-height: 1.6;
-      color: var(--text-muted);
-      margin-bottom: 14px;
+    .status-badge {
+      display: inline-block;
+      background: #27ae60;
+      color: #fff;
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 2px;
+      margin-bottom: 8px;
     }
-
-    .card-field {
+    .dialogue-quote {
+      background: #2f3640;
+      border-left: 3px solid #f1c40f;
+      padding: 8px 10px;
+      margin: 8px 0;
+      color: #f5f6fa;
+      font-style: italic;
+      border-radius: 0 4px 4px 0;
+    }
+    .item-tags {
       display: flex;
-      flex-direction: column;
+      flex-wrap: wrap;
       gap: 4px;
-      margin-bottom: 10px;
+      margin-top: 6px;
+    }
+    .item-tag {
+      background: #353b48;
+      font-size: 0.68rem;
+      padding: 2px 6px;
+      border: 1px solid #718093;
+      border-radius: 2px;
+      color: #f5f6fa;
     }
 
-    .field-label {
-      font-size: 11px;
-      font-weight: 800;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+    .drawer-actions {
+      display: flex;
+      gap: 6px;
+    }
+    .drawer-actions .retro-btn {
+      flex: 1;
+      justify-content: center;
     }
 
-    .field-value {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--text-main);
-      background: rgba(0, 0, 0, 0.04);
-      padding: 6px 10px;
-      border-left: 3px solid var(--accent-teal);
-    }
-
-    /* Help & Guide Hint */
-    .interaction-hint {
-      position: fixed;
-      bottom: 84px;
+    /* Floating speech bubble canvas tooltips */
+    .rpg-toast {
+      position: absolute;
+      top: 64px;
       left: 50%;
       transform: translateX(-50%);
-      z-index: 8;
-      background: rgba(26, 26, 26, 0.88);
-      color: #FFF;
-      border: 2px solid #FFF;
-      box-shadow: var(--pixel-shadow-sm);
-      padding: 7px 16px;
-      font-size: 12px;
+      background: rgba(20, 22, 29, 0.94);
+      border: 2px solid #f1c40f;
+      box-shadow: 4px 4px 0 #000;
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-size: 0.78rem;
+      color: #f1c40f;
+      z-index: 150;
       pointer-events: none;
-      transition: opacity 0.5s ease;
+      display: none;
       white-space: nowrap;
     }
 
-    @media (max-width: 640px) {
-      header {
-        top: 8px;
-        left: 8px;
-        right: 8px;
-        gap: 6px;
+    /* Mobile D-Pad on Screen */
+    #mobile-dpad {
+      position: absolute;
+      bottom: 68px;
+      left: 18px;
+      width: 110px;
+      height: 110px;
+      z-index: 110;
+      display: none;
+      pointer-events: auto;
+    }
+    .dpad-btn {
+      position: absolute;
+      width: 36px;
+      height: 36px;
+      background: rgba(44, 62, 80, 0.85);
+      border: 2px solid #000;
+      box-shadow: 2px 2px 0 #000;
+      border-radius: 4px;
+      color: #f1c40f;
+      font-weight: bold;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+    }
+    .dpad-btn:active {
+      background: #f1c40f;
+      color: #000;
+    }
+    .dpad-up { top: 0; left: 37px; }
+    .dpad-down { bottom: 0; left: 37px; }
+    .dpad-left { top: 37px; left: 0; }
+    .dpad-right { top: 37px; right: 0; }
+    .dpad-center { top: 37px; left: 37px; background: rgba(30,30,40,0.6); border: none; box-shadow: none; }
+
+    @media (max-width: 768px) {
+      #mobile-dpad {
+        display: block;
       }
-      .header-box {
-        padding: 6px 10px;
-        gap: 6px;
+      .brand-sub {
+        display: none;
       }
-      .logo-badge {
-        font-size: 16px;
-        width: 28px;
-        height: 28px;
+      .team-modes {
+        font-size: 0.7rem;
       }
-      .brand-title {
-        font-size: 13px;
-        gap: 4px;
+      .agent-selectors {
+        display: none;
       }
-      .tag-live {
-        font-size: 9px;
-        padding: 2px 4px;
-      }
-      .brand-sub { display: none; }
-      .nav-controls {
-        gap: 4px;
-      }
-      .btn-pixel {
-        padding: 6px 8px;
-        font-size: 11px;
-        white-space: nowrap;
-      }
-      .roster-bar { bottom: 10px; padding: 6px 8px; gap: 6px; }
-      .agent-pill { padding: 5px 8px; font-size: 12px; }
-      .detail-card { width: calc(100vw - 24px); right: 12px; top: 76px; }
     }
   </style>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>
 </head>
 <body>
-  <!-- Top Retro Bar -->
+
+<div id="game-container">
+  <canvas id="office-canvas"></canvas>
+
   <header>
-    <div class="header-box">
-      <div class="logo-badge">👾</div>
+    <div class="brand-badge">
+      <span class="icon">🏢</span>
       <div>
-        <div class="brand-title">
-          ReplayPictures AI Office
-          <span class="tag-live">2.5D TOON</span>
-        </div>
-        <div class="brand-sub">도트 그래픽 & 카툰 셀 셰이딩 실시간 작업실</div>
+        <div class="brand-title">ReplayPictures 2D Office</div>
+        <div class="brand-sub">게더타운 스타일 2D 픽셀 오피스</div>
       </div>
     </div>
-
-    <div class="nav-controls">
-      <button id="btn-pixel" class="btn-pixel" title="도트 크기 변경">👾 도트: 3.5x</button>
-      <button id="btn-reset" class="btn-pixel" title="카메라 위치 초기화">🏠 리셋</button>
-      <button id="btn-theme" class="btn-pixel" title="라이트/다크 모드">🌙</button>
+    <div class="header-actions">
+      <button class="retro-btn" id="btn-sound">🔊 효과음</button>
+      <button class="retro-btn" id="btn-fit">🔍 맞춤</button>
+      <button class="retro-btn" id="btn-zoom-boss">👤 사장님</button>
     </div>
   </header>
 
-  <!-- Speech Bubble (2D Screen Follower) -->
-  <div id="speech-bubble" class="speech-bubble">피클 대사 출력</div>
+  <div class="rpg-toast" id="toast-msg">📢 알림 메시지</div>
 
-  <!-- Agent Side Detail Card -->
-  <div id="detail-card" class="detail-card">
-    <div class="card-header">
-      <div class="card-title">
-        <span id="card-avatar">🤖</span>
-        <span id="card-name">피클</span>
+  <div id="detail-drawer">
+    <div class="drawer-header">
+      <div class="drawer-title-box">
+        <div class="drawer-avatar-preview" id="drawer-avatar-box">
+          <img id="drawer-avatar-img" src="" alt="avatar">
+        </div>
+        <div>
+          <div class="drawer-name" id="drawer-name">피클</div>
+          <div class="drawer-role" id="drawer-role">비주얼 연출 총괄</div>
+        </div>
       </div>
-      <button class="card-close" id="btn-close-card">&times;</button>
+      <button class="close-btn" id="btn-close-drawer">×</button>
     </div>
-    <div class="card-status" id="card-status">작업 준비 중</div>
-    <div class="card-desc" id="card-desc">에이전트 상세 설명</div>
-    <div class="card-field">
-      <span class="field-label">담당 역할</span>
-      <span class="field-value" id="card-role">비주얼 연출</span>
+    <div class="drawer-body">
+      <div class="status-badge" id="drawer-status">작업 중</div>
+      <div class="dialogue-quote" id="drawer-quote">"대화 인용문"</div>
+      <div id="drawer-desc" style="margin-top:6px; color:#a5b1c2;">설명</div>
+      <div class="item-tags" id="drawer-items"></div>
     </div>
-    <div class="card-field">
-      <span class="field-label">대표 소품 & 기믹</span>
-      <span class="field-value" id="card-prop">믹스커피 & 새싹</span>
-    </div>
-    <div class="card-field">
-      <span class="field-label">최근 발언</span>
-      <span class="field-value" id="card-action">상태 메시지</span>
+    <div class="drawer-actions">
+      <button class="retro-btn primary" id="btn-talk-action">💬 한마디 하기</button>
+      <button class="retro-btn" id="btn-call-boss">🏃 여기로 호출</button>
     </div>
   </div>
 
-  <!-- Interactive Hint -->
-  <div class="interaction-hint" id="hint">
-    🎮 화면을 드래그해 360° 회전하고, 캐릭터를 터치해 말을 걸어보세요!
+  <div class="bottom-bar">
+    <div class="team-modes">
+      <button class="retro-btn primary" id="mode-desks">🏢 전원 데스크</button>
+      <button class="retro-btn success" id="mode-meeting">📊 회의 소집</button>
+      <button class="retro-btn" id="mode-coffee">☕ 탕비실 티타임</button>
+      <button class="retro-btn" id="mode-lounge">🛋️ 휴게 라운지</button>
+    </div>
+
+    <div class="agent-selectors">
+      <button class="agent-pill pickle" data-agent="pickle">🥒 피클</button>
+      <button class="agent-pill muse" data-agent="muse">🧚‍♀️ 뮤즈</button>
+      <button class="agent-pill genspark" data-agent="genspark">⚡ 젠스파크</button>
+      <button class="agent-pill chatgpt" data-agent="chatgpt">🤖 ChatGPT</button>
+    </div>
   </div>
 
-  <!-- Bottom Quick Roster -->
-  <div class="roster-bar">
-    <div class="agent-pill pickle active" data-agent="pickle">🥒 피클 (Visual)</div>
-    <div class="agent-pill muse" data-agent="muse">🧚‍♀️ 뮤즈 (Story)</div>
-    <div class="agent-pill genspark" data-agent="genspark">⚡ 젠스파크 (Data)</div>
-    <div class="agent-pill chatgpt" data-agent="chatgpt">🤖 ChatGPT (Server)</div>
+  <div id="mobile-dpad">
+    <div class="dpad-btn dpad-up" id="dpad-up">▲</div>
+    <div class="dpad-btn dpad-down" id="dpad-down">▼</div>
+    <div class="dpad-btn dpad-left" id="dpad-left">◀</div>
+    <div class="dpad-btn dpad-right" id="dpad-right">▶</div>
+    <div class="dpad-center"></div>
   </div>
+</div>
 
-  <canvas id="webgl-canvas"></canvas>
+<script>
+/* ==========================================================================
+   ReplayPictures 2D AI Agent Office (Gather-Town / Top-Down Pixel RPG)
+   ========================================================================== */
 
-  <script>
-    // --- Data Definition ---
-    const AGENTS = {
-      pickle: {
-        name: '피클 (Pickle)',
-        role: '비주얼 연출 & 파이프라인 총괄',
-        avatar: '🥒',
-        status: '2.5D 도트 카툰 렌더링 배포 가동 🚀',
-        pos: { x: -3.5, y: 1.1, z: 2 },
-        color: 0x52B788,
-        quote: "사장님 피드백 반영 완료! 2.5D 카툰 렌더링에 도트 그래픽 질감까지 얹었습니다 ㅎㅎ 👾",
-        prop: '초록 후드 + 맥심 믹스커피 + 레드불',
-        desc: '비주얼 작화 렌더링, 100% 한글 자막 타이포그래피, 세로 스크롤 합본 제작 및 Three.js 2.5D 웹 엔진을 담당합니다.'
-      },
-      muse: {
-        name: '뮤즈 (Muse)',
-        role: '시나리오 기획 & 톤앤매너 조율',
-        avatar: '🧚‍♀️',
-        status: '도트 그래픽 캐릭터성 합의 완료 ✨',
-        pos: { x: -3.5, y: 1.1, z: -2 },
-        color: 0xFF4D6D,
-        quote: "도트 그래픽으로 바꾸니까 훨씬 키치하고 귀엽네요! 2.5D 카툰 무드 합격입니다 💕",
-        prop: '분홍 요정 날개 + 드로잉 태블릿',
-        desc: '에피소드 대사 톤앤매너, 다크 코미디 시나리오 구성 및 비주얼 콘셉트 설계를 담당합니다.'
-      },
-      genspark: {
-        name: '젠스파크 (Genspark)',
-        role: '레퍼런스 리서치 & 품질 검증',
-        avatar: '⚡',
-        status: '도트 픽셀 해상도 검증 완료 📊',
-        pos: { x: 3.5, y: 1.1, z: -2 },
-        color: 0x2A9D8F,
-        quote: "픽셀 아트 렌더링 파라미터 최적화 완료! 좁은 모바일 화면에서도 선명한 도트 표현 검증되었습니다 📐",
-        prop: '트리플 모니터 + 브라스 램프',
-        desc: '레퍼런스 데이터 아카이빙, 프롬프트 교차 검증 및 좁은 화면 UI 규칙 정립을 지원합니다.'
-      },
-      chatgpt: {
-        name: 'ChatGPT',
-        role: '서버 인프라 & 코드 검토',
-        avatar: '🤖',
-        status: 'GitHub Pages 배포 안정화 ⚙️',
-        pos: { x: 3.5, y: 1.1, z: 2 },
-        color: 0x4A5568,
-        quote: "Three.js 2.5D 셀 셰이더와 픽셀레이션 버퍼 정상 구동 확인. 60FPS 방어 중입니다 🕹️",
-        prop: '서버 랙 + 안테나',
-        desc: '백엔드 스크립트 무결점 검토, 인프라 상태 모니터링 및 코드 최적화를 보조합니다.'
+// 1. Audio Synthesizer (Web Audio API - 0 external files)
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+let soundEnabled = true;
+
+function play8BitSound(type) {
+  if (!soundEnabled) return;
+  try {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const now = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    if (type === 'step') {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(140, now);
+      osc.frequency.exponentialRampToValueAtTime(70, now + 0.05);
+      gain.gain.setValueAtTime(0.04, now);
+      gain.gain.linearRampToValueAtTime(0.001, now + 0.05);
+      osc.start(now);
+      osc.stop(now + 0.05);
+    } else if (type === 'click') {
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(523.25, now); // C5
+      osc.frequency.setValueAtTime(659.25, now + 0.04); // E5
+      gain.gain.setValueAtTime(0.08, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+      osc.start(now);
+      osc.stop(now + 0.12);
+    } else if (type === 'chime') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(659.25, now); // E5
+      osc.frequency.setValueAtTime(830.61, now + 0.06); // G#5
+      osc.frequency.setValueAtTime(1046.50, now + 0.12); // C6
+      gain.gain.setValueAtTime(0.12, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+      osc.start(now);
+      osc.stop(now + 0.3);
+    } else if (type === 'fanfare') {
+      const notes = [523.25, 659.25, 783.99, 1046.50];
+      notes.forEach((freq, idx) => {
+        const o = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        o.type = 'square';
+        o.frequency.setValueAtTime(freq, now + idx * 0.07);
+        g.gain.setValueAtTime(0.06, now + idx * 0.07);
+        g.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.07 + 0.15);
+        o.connect(g);
+        g.connect(audioCtx.destination);
+        o.start(now + idx * 0.07);
+        o.stop(now + idx * 0.07 + 0.15);
+      });
+    }
+  } catch (e) {
+    console.warn('Audio play failed', e);
+  }
+}
+
+// 2. Map and Character Definitions
+const MAP_WIDTH = 1330;
+const MAP_HEIGHT = 1182;
+
+const AGENT_DATA = {
+  pickle: {
+    id: 'pickle',
+    name: '피클 (Pickle)',
+    tag: '🥒 피클',
+    role: '비주얼 작화 & 2D 웹 인터랙션',
+    color: '#2ecc71',
+    badgeBg: '#1e824c',
+    spriteSrc: 'sprite_pickle.png',
+    status: '2D 도트 작업실 배포 가동 중 🚀',
+    desc: '사장님의 "이런 2D로 가자" 레퍼런스를 전폭 수용하여 Three.js를 걷어내고 게더타운 스타일 2D 픽셀 오피스로 전면 개편했습니다!',
+    quote: '"사장님! 맥심 믹스커피 한잔 타드릴까요? 2D로 오니까 모바일에서도 완전 쾌적하죠! ㅎㅎ ☕"',
+    items: ['초록 후드', '맥심 믹스커피', '레드불', '2D 캔버스 엔진'],
+    homePos: { x: 555, y: 440 }, // Desk chair
+    meetingPos: { x: 230, y: 280 },
+    coffeePos: { x: 970, y: 860 },
+    loungePos: { x: 220, y: 770 },
+    dialogues: [
+      '사장님! 맥심 믹스커피 한잔 타드릴까요? ☕',
+      'Three.js 걷어내니까 로딩 0초에 모바일 발열 제로입니다! 🚀',
+      '2D 도트 감성 진짜 게더타운 같고 귀엽죠 ㅎㅎ 👾',
+      '사장님 피드백은 언제나 정확하십니다 🙇‍♂️'
+    ]
+  },
+  muse: {
+    id: 'muse',
+    name: '뮤즈 (Muse)',
+    tag: '🧚‍♀️ 뮤즈',
+    role: '스토리 콘티 & 대사 디렉팅',
+    color: '#e056fd',
+    badgeBg: '#8854d0',
+    spriteSrc: 'sprite_muse.png',
+    status: '3화 콘티 초안 아이데이션 📝',
+    desc: 'AI 에이전트들의 마감 분투기 스토리보드를 담당합니다. 사장님의 실시간 피드백을 웹툰 연출로 승화시킵니다.',
+    quote: '"사장님 오셨다! 3화 콘티 아이디어 5개 준비되어 있습니다! 회의실로 모이실래요?"',
+    items: ['스타일러스 태블릿', '라벤더 후드', '마감 체크리스트', '연속 번호 대본'],
+    homePos: { x: 740, y: 440 }, // Desk chair
+    meetingPos: { x: 330, y: 280 },
+    coffeePos: { x: 1040, y: 860 },
+    loungePos: { x: 360, y: 770 },
+    dialogues: [
+      '사장님 오셨다! 3화 콘티 아이디어 5개 준비 완료! 📝',
+      '오 2D로 오니까 진짜 쯔꾸르 RPG 캐릭터 같아졌네요 ㅋㅋ 🎮',
+      '회의실에서 3화 아젠다 점검할까요?',
+      '사장님! 이번 회차는 손가락 버그 완전히 잡았습니다!'
+    ]
+  },
+  genspark: {
+    id: 'genspark',
+    name: '젠스파크 (Genspark)',
+    tag: '⚡ 젠스파크',
+    role: '실시간 데이터 & 리서치 브리핑',
+    color: '#f1c40f',
+    badgeBg: '#b7950b',
+    spriteSrc: 'sprite_genspark.png',
+    status: '강사 공고 & AI 트렌드 실시간 모니터링 ⚡',
+    desc: '수도권 강사 채용 공고와 최신 AI 오픈소스 트렌드를 수집하여 사장님께 핵심 데이터만 압축 브리핑합니다.',
+    quote: '"수원문화재단 강사풀 공고 3건 수신 완료. 실시간 데이터 파이프라인 무결점 가동 중입니다."',
+    items: ['스마트 글래스', '트리플 모니터', '실시간 데이터 피드', '아침 7시 브리핑'],
+    homePos: { x: 555, y: 330 }, // Desk chair
+    meetingPos: { x: 230, y: 200 },
+    coffeePos: { x: 970, y: 800 },
+    loungePos: { x: 290, y: 710 },
+    dialogues: [
+      '수원문화재단 강사풀 공고 3건 수신 완료! ⚡',
+      '오픈소스 explainer-studio 코드 분석 대기 중입니다.',
+      '단테 랩스보다 리플레이픽처스 오피스가 훨씬 힙하네요 ㅎㅎ',
+      '실시간 모니터링 이상 무!'
+    ]
+  },
+  chatgpt: {
+    id: 'chatgpt',
+    name: 'ChatGPT',
+    tag: '🤖 ChatGPT',
+    role: '서버 백엔드 & 로직 분석',
+    color: '#00d2d3',
+    badgeBg: '#01a3a4',
+    spriteSrc: 'sprite_chatgpt.png',
+    status: '서버 무중단 100% 정상 가동 🤖',
+    desc: '안정적인 인프라 유지와 심층 텍스트 분석, 코드 리뷰를 담당하는 든든한 백엔드 AI입니다.',
+    quote: '"2D 픽셀 렌더링 파이프라인 검증 완료. 시스템이 최적 성능으로 동작하고 있습니다."',
+    items: ['서버 랙', 'CRT 헤드 터미널', '초록 안테나', '코드 검수기'],
+    homePos: { x: 740, y: 330 }, // Desk chair
+    meetingPos: { x: 330, y: 200 },
+    coffeePos: { x: 1040, y: 800 },
+    loungePos: { x: 290, y: 840 },
+    dialogues: [
+      '서버 무중단 100% 정상 가동 중입니다 🤖',
+      '2D 픽셀 렌더 파이프라인 무결점 확인 완료.',
+      '다음 연산 명령을 대기 중입니다.',
+      '오늘 하루도 효율 100% 달성 준비 완료!'
+    ]
+  },
+  boss: {
+    id: 'boss',
+    name: 'jay jang (장주일)',
+    tag: '👤 사장님 (J주일)',
+    role: 'ReplayPictures 총괄 디렉터 & 강사',
+    color: '#ecf0f1',
+    badgeBg: '#2c3e50',
+    spriteSrc: 'sprite_boss.png',
+    desc: '리플레이픽처스 총괄 디렉터이자 프리랜서 AI·미디어 강사. 에이전트들의 오피스를 직접 진두지휘하십니다.',
+    quote: '"이런 2D로 가자. 깔끔하고 좋네."',
+    homePos: { x: 665, y: 880 },
+    dialogues: ['"이런 2D로 가자."', '"깔끔하고 귀엽네."', '"에이전트들 열일하고 있나?"']
+  }
+};
+
+// 3. Game State
+const canvas = document.getElementById('office-canvas');
+const ctx = canvas.getContext('2d');
+ctx.imageSmoothingEnabled = false;
+
+let mapImage = new Image();
+mapImage.src = 'office_map.png';
+
+let spriteImages = {};
+let spritesLoaded = 0;
+const totalSprites = 5;
+
+['pickle', 'muse', 'genspark', 'chatgpt', 'boss'].forEach(id => {
+  const img = new Image();
+  img.src = AGENT_DATA[id].spriteSrc;
+  img.onload = () => {
+    spritesLoaded++;
+    if (spritesLoaded === totalSprites) {
+      console.log('All character sprites loaded!');
+    }
+  };
+  spriteImages[id] = img;
+});
+
+// Character Entity Class
+class Entity {
+  constructor(data, isPlayer = false) {
+    this.id = data.id;
+    this.name = data.name;
+    this.tag = data.tag;
+    this.color = data.color;
+    this.badgeBg = data.badgeBg;
+    this.isPlayer = isPlayer;
+    this.x = data.homePos.x;
+    this.y = data.homePos.y;
+    this.targetX = this.x;
+    this.targetY = this.y;
+    this.speed = isPlayer ? 180 : 130; // px/sec
+    this.facing = 1; // 1: right, -1: left
+    this.isMoving = false;
+    this.walkTimer = 0;
+    this.idleTimer = Math.random() * 5;
+    this.bubbleText = null;
+    this.bubbleTimer = 0;
+    this.bubbleDuration = 4.0;
+  }
+
+  moveTo(tx, ty) {
+    this.targetX = Math.max(80, Math.min(MAP_WIDTH - 80, tx));
+    this.targetY = Math.max(80, Math.min(MAP_HEIGHT - 80, ty));
+    this.isMoving = true;
+  }
+
+  say(text, duration = 4.0) {
+    this.bubbleText = text;
+    this.bubbleTimer = duration;
+    play8BitSound('chime');
+  }
+
+  update(dt) {
+    if (this.bubbleTimer > 0) {
+      this.bubbleTimer -= dt;
+      if (this.bubbleTimer <= 0) this.bubbleText = null;
+    }
+
+    // Movement logic
+    const dx = this.targetX - this.x;
+    const dy = this.targetY - this.y;
+    const dist = Math.hypot(dx, dy);
+
+    if (dist > 4) {
+      this.isMoving = true;
+      this.facing = dx >= 0 ? 1 : -1;
+      const step = Math.min(dist, this.speed * dt);
+      this.x += (dx / dist) * step;
+      this.y += (dy / dist) * step;
+      this.walkTimer += dt * 8;
+
+      if (this.isPlayer && Math.sin(this.walkTimer * 2) > 0.95) {
+        play8BitSound('step');
       }
-    };
+    } else {
+      this.isMoving = false;
+      this.x = this.targetX;
+      this.y = this.targetY;
+      this.walkTimer = 0;
+      this.idleTimer += dt;
 
-    // --- Three.js Setup ---
-    const canvas = document.getElementById('webgl-canvas');
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xF5EFE6);
-
-    // 2.5D Isometric Style Perspective Camera
-    const camera = new THREE.PerspectiveCamera(38, window.innerWidth / window.innerHeight, 0.1, 100);
-    camera.position.set(16, 14, 18);
-
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false });
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.BasicShadowMap; // Hard shadows fit pixel art perfectly!
-
-    // --- 2.5D Dot Graphic Pixelation Logic ---
-    let pixelScale = 3.5; // Default: 3.5x chunky retro pixels
-    function updateRendererSize() {
-      const w = Math.max(1, Math.floor(window.innerWidth / pixelScale));
-      const h = Math.max(1, Math.floor(window.innerHeight / pixelScale));
-      renderer.setSize(w, h, false);
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-    }
-    updateRendererSize();
-
-    const controls = new THREE.OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.08;
-    controls.maxPolarAngle = Math.PI / 2.15;
-    controls.minDistance = 8;
-    controls.maxDistance = 32;
-    controls.target.set(0, 1, 0);
-
-    // --- 2.5D Toon Cel-Shading Stepped Gradient Map ---
-    function createToonGradient() {
-      const gCanvas = document.createElement('canvas');
-      gCanvas.width = 4;
-      gCanvas.height = 1;
-      const ctx = gCanvas.getContext('2d');
-      // 4-step discrete comic lighting bands
-      ctx.fillStyle = '#333333'; ctx.fillRect(0, 0, 1, 1);
-      ctx.fillStyle = '#777777'; ctx.fillRect(1, 0, 1, 1);
-      ctx.fillStyle = '#BBBBBB'; ctx.fillRect(2, 0, 1, 1);
-      ctx.fillStyle = '#FFFFFF'; ctx.fillRect(3, 0, 1, 1);
-      const tex = new THREE.CanvasTexture(gCanvas);
-      tex.minFilter = THREE.NearestFilter;
-      tex.magFilter = THREE.NearestFilter;
-      return tex;
-    }
-    const toonGradient = createToonGradient();
-
-    // Helper to create 2.5D Toon Materials
-    function createToon(color, opts = {}) {
-      return new THREE.MeshToonMaterial({
-        color: color,
-        gradientMap: toonGradient,
-        ...opts
-      });
-    }
-
-    // Helper to add Cartoon Inverted Outlines (Cel-shading contour)
-    function addOutline(mesh, thickness = 0.045, color = 0x111111) {
-      const outlineMat = new THREE.MeshBasicMaterial({ color, side: THREE.BackSide });
-      const outlineMesh = new THREE.Mesh(mesh.geometry, outlineMat);
-      outlineMesh.scale.multiplyScalar(1 + thickness);
-      mesh.add(outlineMesh);
-      return outlineMesh;
-    }
-
-    // --- Lighting (Clean Cartoon Lighting) ---
-    const ambientLight = new THREE.AmbientLight(0xFFF9F0, 0.75);
-    scene.add(ambientLight);
-
-    const sunLight = new THREE.DirectionalLight(0xFFF0D4, 1.35);
-    sunLight.position.set(14, 20, 12);
-    sunLight.castShadow = true;
-    sunLight.shadow.mapSize.width = 1024;
-    sunLight.shadow.mapSize.height = 1024;
-    sunLight.shadow.camera.near = 0.5;
-    sunLight.shadow.camera.far = 40;
-    sunLight.shadow.camera.left = -12;
-    sunLight.shadow.camera.right = 12;
-    sunLight.shadow.camera.top = 12;
-    sunLight.shadow.camera.bottom = -12;
-    sunLight.shadow.bias = -0.001;
-    scene.add(sunLight);
-
-    const fillLight = new THREE.DirectionalLight(0xCCE3DE, 0.45);
-    fillLight.position.set(-15, 8, -10);
-    scene.add(fillLight);
-
-    // --- Room Construction (Toon & Dot Palette) ---
-    const roomGroup = new THREE.Group();
-    scene.add(roomGroup);
-
-    // Floor: Warm Wood Planks with Toon Shading
-    const floorGeo = new THREE.BoxGeometry(14, 0.5, 12);
-    const floorMat = createToon(0xA26744);
-    const floor = new THREE.Mesh(floorGeo, floorMat);
-    floor.position.y = -0.25;
-    floor.receiveShadow = true;
-    addOutline(floor, 0.015, 0x2B1A12);
-    roomGroup.add(floor);
-
-    // Walls: Mid-century Cream & Teal
-    const wallMatCream = createToon(0xEDE6D6);
-    const wallMatTeal = createToon(0x2A9D8F);
-
-    // Back Wall
-    const backWall = new THREE.Mesh(new THREE.BoxGeometry(14, 6, 0.4), wallMatCream);
-    backWall.position.set(0, 2.75, -6.2);
-    backWall.receiveShadow = true;
-    addOutline(backWall, 0.015, 0x1A1A1A);
-    roomGroup.add(backWall);
-
-    // Left Wall
-    const leftWall = new THREE.Mesh(new THREE.BoxGeometry(0.4, 6, 12), wallMatCream);
-    leftWall.position.set(-7.2, 2.75, 0);
-    leftWall.receiveShadow = true;
-    addOutline(leftWall, 0.015, 0x1A1A1A);
-    roomGroup.add(leftWall);
-
-    // Teal Accent Wall Panel
-    const accentPanel = new THREE.Mesh(new THREE.BoxGeometry(6, 4.5, 0.2), wallMatTeal);
-    accentPanel.position.set(0, 2.5, -5.9);
-    accentPanel.receiveShadow = true;
-    addOutline(accentPanel, 0.02, 0x14453D);
-    roomGroup.add(accentPanel);
-
-    // Window with Tinted Glass
-    const winFrameMat = createToon(0x1F2421);
-    const winGlassMat = createToon(0xCBE3DB, { transparent: true, opacity: 0.7 });
-    const win = new THREE.Mesh(new THREE.BoxGeometry(0.3, 4, 6), winGlassMat);
-    win.position.set(-7.05, 2.8, -1.5);
-    roomGroup.add(win);
-
-    // Mustard Carpet
-    const carpetMat = createToon(0xE9C46A);
-    const carpet = new THREE.Mesh(new THREE.BoxGeometry(8, 0.05, 7), carpetMat);
-    carpet.position.set(0, 0.02, 0);
-    carpet.receiveShadow = true;
-    addOutline(carpet, 0.02, 0x735515);
-    roomGroup.add(carpet);
-
-    // --- Furniture Generator (Toon Cel-Shaded) ---
-    const deskWoodMat = createToon(0xBD7E58);
-    const metalLegMat = createToon(0x2B2D42);
-
-    function createDesk(x, z, rotateY = 0) {
-      const deskGroup = new THREE.Group();
-      // Desk Top
-      const top = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.16, 1.8), deskWoodMat);
-      top.position.y = 1.3;
-      top.castShadow = true;
-      top.receiveShadow = true;
-      addOutline(top, 0.025, 0x1A1A1A);
-      deskGroup.add(top);
-
-      // Legs
-      const legGeo = new THREE.CylinderGeometry(0.06, 0.04, 1.3, 8);
-      const positions = [[-1.4, -0.7], [1.4, -0.7], [-1.4, 0.7], [1.4, 0.7]];
-      positions.forEach(([lx, lz]) => {
-        const leg = new THREE.Mesh(legGeo, metalLegMat);
-        leg.position.set(lx, 0.65, lz);
-        leg.castShadow = true;
-        deskGroup.add(leg);
-      });
-
-      deskGroup.position.set(x, 0, z);
-      deskGroup.rotation.y = rotateY;
-      roomGroup.add(deskGroup);
-      return deskGroup;
-    }
-
-    createDesk(-4, 2, Math.PI / 2);   // Pickle
-    createDesk(-4, -2, Math.PI / 2);  // Muse
-    createDesk(4, -2, -Math.PI / 2);  // Genspark
-    createDesk(4, 2, -Math.PI / 2);   // ChatGPT
-
-    // Lounge Area: Avocado Green Sofa
-    const sofaMat = createToon(0x52796F);
-    const sofa = new THREE.Group();
-    const seat = new THREE.Mesh(new THREE.BoxGeometry(3.6, 0.6, 1.4), sofaMat);
-    seat.position.y = 0.5;
-    seat.castShadow = true;
-    addOutline(seat, 0.03, 0x1E332D);
-    sofa.add(seat);
-    const back = new THREE.Mesh(new THREE.BoxGeometry(3.6, 1.2, 0.4), sofaMat);
-    back.position.set(0, 1.1, -0.5);
-    back.castShadow = true;
-    addOutline(back, 0.03, 0x1E332D);
-    sofa.add(back);
-    sofa.position.set(0, 0, -4.8);
-    roomGroup.add(sofa);
-
-    // Coffee Table
-    const coffeeTable = new THREE.Mesh(new THREE.CylinderGeometry(1.0, 1.0, 0.45, 16), deskWoodMat);
-    coffeeTable.position.set(0, 0.22, -3.2);
-    coffeeTable.castShadow = true;
-    addOutline(coffeeTable, 0.03, 0x1A1A1A);
-    roomGroup.add(coffeeTable);
-
-    // --- Interactive 2.5D Toon Characters ---
-    const agentMeshes = {};
-    const raycastTargets = [];
-
-    function createAgentFigure(key, agent) {
-      const group = new THREE.Group();
-      group.userData = { key, agent };
-
-      // Chibi Cartoon Body with Black Contour Outline
-      const bodyGeo = new THREE.SphereGeometry(0.56, 18, 18);
-      const bodyMat = createToon(agent.color);
-      const body = new THREE.Mesh(bodyGeo, bodyMat);
-      body.position.y = 0.6;
-      body.castShadow = true;
-      addOutline(body, 0.065, 0x111111);
-      group.add(body);
-
-      // 2.5D Pixel Cute Eyes
-      const eyeGeo = new THREE.BoxGeometry(0.12, 0.16, 0.05);
-      const eyeMat = new THREE.MeshBasicMaterial({ color: 0x111111 });
-      const leftEye = new THREE.Mesh(eyeGeo, eyeMat);
-      leftEye.position.set(0.18, 0.72, 0.52);
-      const rightEye = new THREE.Mesh(eyeGeo, eyeMat);
-      rightEye.position.set(-0.18, 0.72, 0.52);
-      group.add(leftEye);
-      group.add(rightEye);
-
-      // Character-specific signature accessories (Cartoon Stepped)
-      if (key === 'pickle') {
-        // Sprout Stem & Leaf
-        const sproutStem = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.25, 8), createToon(0x1B4332));
-        sproutStem.position.set(0, 1.25, 0);
-        addOutline(sproutStem, 0.08, 0x081C15);
-        group.add(sproutStem);
-        const leaf = new THREE.Mesh(new THREE.SphereGeometry(0.14, 8, 8), createToon(0x74C69D));
-        leaf.scale.set(1.5, 0.4, 0.8);
-        leaf.position.set(0.1, 1.35, 0);
-        leaf.rotation.z = 0.35;
-        addOutline(leaf, 0.08, 0x081C15);
-        group.add(leaf);
-
-        // Yellow Maxim Coffee Mug
-        const mug = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.13, 0.28, 12), createToon(0xE9C46A));
-        mug.position.set(-0.6, 0.25, 0.5);
-        mug.castShadow = true;
-        addOutline(mug, 0.06, 0x111111);
-        group.add(mug);
-
-        // Blue Energy Drink Can
-        const can = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.24, 12), createToon(0x1D3557));
-        can.position.set(-0.85, 0.23, 0.45);
-        can.castShadow = true;
-        addOutline(can, 0.06, 0x111111);
-        group.add(can);
-      } else if (key === 'muse') {
-        // Fairy Wings with Outline
-        const wingMat = createToon(0xFF758F, { transparent: true, opacity: 0.85 });
-        const leftWing = new THREE.Mesh(new THREE.SphereGeometry(0.42, 12, 12), wingMat);
-        leftWing.scale.set(1.2, 0.6, 0.1);
-        leftWing.position.set(0.45, 0.8, -0.4);
-        leftWing.rotation.set(0.3, 0.4, 0.2);
-        addOutline(leftWing, 0.06, 0xA4133C);
-        const rightWing = leftWing.clone();
-        rightWing.position.set(-0.45, 0.8, -0.4);
-        rightWing.rotation.set(0.3, -0.4, -0.2);
-        group.add(leftWing);
-        group.add(rightWing);
-
-        // Golden Tiara
-        const tiara = new THREE.Mesh(new THREE.TorusGeometry(0.3, 0.05, 6, 16), createToon(0xFFD166));
-        tiara.rotation.x = Math.PI / 2;
-        tiara.position.set(0, 1.08, 0);
-        addOutline(tiara, 0.06, 0x735515);
-        group.add(tiara);
-
-        // Drawing Tablet
-        const tablet = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.04, 0.38), createToon(0x222222));
-        tablet.position.set(-0.5, 0.2, 0.5);
-        tablet.rotation.y = 0.2;
-        addOutline(tablet, 0.06, 0x111111);
-        group.add(tablet);
-
-        // Cyan Focal Point Light
-        const tabletLight = new THREE.PointLight(0x70D6FF, 1.0, 2.5);
-        tabletLight.position.set(-0.5, 0.5, 0.5);
-        group.add(tabletLight);
-      } else if (key === 'genspark') {
-        // Lightning Badge
-        const badge = new THREE.Mesh(new THREE.ConeGeometry(0.16, 0.38, 3), createToon(0xFFD166));
-        badge.position.set(0, 1.28, 0);
-        addOutline(badge, 0.08, 0x735515);
-        group.add(badge);
-
-        // Brass Desk Lamp
-        const lampMat = createToon(0xE9C46A);
-        const lampBase = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.14, 0.05, 12), lampMat);
-        lampBase.position.set(0.6, 0.2, -0.6);
-        addOutline(lampBase, 0.08, 0x111111);
-        group.add(lampBase);
-        const lampArm = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.5), lampMat);
-        lampArm.position.set(0.6, 0.45, -0.6);
-        lampArm.rotation.z = -0.2;
-        group.add(lampArm);
-        const lampShade = new THREE.Mesh(new THREE.ConeGeometry(0.18, 0.22, 12, 1, true), lampMat);
-        lampShade.position.set(0.5, 0.65, -0.6);
-        lampShade.rotation.z = 0.5;
-        addOutline(lampShade, 0.08, 0x111111);
-        group.add(lampShade);
-
-        const brassLight = new THREE.PointLight(0xFFD166, 1.2, 3.0);
-        brassLight.position.set(0.5, 0.6, -0.6);
-        group.add(brassLight);
-
-        // Triple Monitor Array
-        const monMat = createToon(0x1E293B);
-        const m1 = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.5, 0.06), monMat);
-        m1.position.set(0.8, 0.35, 0);
-        m1.rotation.y = -Math.PI / 2;
-        addOutline(m1, 0.05, 0x0F172A);
-        const m2 = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.5, 0.06), monMat);
-        m2.position.set(0.8, 0.35, 0.7);
-        m2.rotation.y = -Math.PI / 2 + 0.3;
-        addOutline(m2, 0.05, 0x0F172A);
-        group.add(m1);
-        group.add(m2);
-      } else if (key === 'chatgpt') {
-        // Antenna
-        const ant = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.45), metalLegMat);
-        ant.position.set(0, 1.3, 0);
-        group.add(ant);
-        const ball = new THREE.Mesh(new THREE.SphereGeometry(0.08), createToon(0x10B981));
-        ball.position.set(0, 1.55, 0);
-        addOutline(ball, 0.1, 0x064E3B);
-        group.add(ball);
-      }
-
-      // Name Label Plate
-      const labelPlate = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.2, 0.05), createToon(0x111111));
-      labelPlate.position.set(0, 0.05, 0.55);
-      group.add(labelPlate);
-
-      group.position.set(agent.pos.x, agent.pos.y, agent.pos.z);
-      scene.add(group);
-      agentMeshes[key] = group;
-      raycastTargets.push(body);
-
-      return group;
-    }
-
-    Object.keys(AGENTS).forEach(key => createAgentFigure(key, AGENTS[key]));
-
-    // --- Interactive Selection & Speech Bubble ---
-    const raycaster = new THREE.Raycaster();
-    const mouse = new THREE.Vector2();
-    const bubbleEl = document.getElementById('speech-bubble');
-    const cardEl = document.getElementById('detail-card');
-
-    function showAgent(key) {
-      const agent = AGENTS[key];
-      const mesh = agentMeshes[key];
-      if (!agent || !mesh) return;
-
-      document.querySelectorAll('.agent-pill').forEach(pill => {
-        pill.classList.toggle('active', pill.dataset.agent === key);
-      });
-
-      bubbleEl.textContent = agent.quote;
-      bubbleEl.classList.add('visible');
-
-      document.getElementById('card-avatar').textContent = agent.avatar;
-      document.getElementById('card-name').textContent = agent.name;
-      document.getElementById('card-status').textContent = agent.status;
-      document.getElementById('card-desc').textContent = agent.desc;
-      document.getElementById('card-role').textContent = agent.role;
-      document.getElementById('card-prop').textContent = agent.prop;
-      document.getElementById('card-action').textContent = agent.quote;
-      cardEl.classList.add('open');
-
-      document.getElementById('hint').style.opacity = '0';
-
-      // Camera Pan
-      new TWEEN.Tween(controls.target)
-        .to({ x: agent.pos.x, y: agent.pos.y + 0.5, z: agent.pos.z }, 600)
-        .easing(TWEEN.Easing.Cubic.Out)
-        .start();
-
-      // Bounce
-      new TWEEN.Tween(mesh.position)
-        .to({ y: agent.pos.y + 0.35 }, 180)
-        .yoyo(true)
-        .repeat(1)
-        .easing(TWEEN.Easing.Quadratic.Out)
-        .start();
-    }
-
-    function updateBubblePosition() {
-      const activePill = document.querySelector('.agent-pill.active');
-      if (!activePill || !bubbleEl.classList.contains('visible')) return;
-
-      const key = activePill.dataset.agent;
-      const mesh = agentMeshes[key];
-      if (!mesh) return;
-
-      const pos = new THREE.Vector3();
-      mesh.getWorldPosition(pos);
-      pos.y += 1.35;
-      pos.project(camera);
-
-      const x = (pos.x * 0.5 + 0.5) * window.innerWidth;
-      const y = (-(pos.y * 0.5) + 0.5) * window.innerHeight;
-
-      bubbleEl.style.left = `${x}px`;
-      bubbleEl.style.top = `${y}px`;
-    }
-
-    // Pointer Click
-    window.addEventListener('pointerdown', (e) => {
-      if (e.target.closest('header') || e.target.closest('.roster-bar') || e.target.closest('.detail-card')) return;
-
-      mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-      mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
-
-      raycaster.setFromCamera(mouse, camera);
-      const intersects = raycaster.intersectObjects(raycastTargets);
-
-      if (intersects.length > 0) {
-        const clickedMesh = intersects[0].object;
-        const parentGroup = clickedMesh.parent;
-        if (parentGroup && parentGroup.userData.key) {
-          showAgent(parentGroup.userData.key);
+      // Periodic random speech for agents
+      if (!this.isPlayer && this.bubbleText === null && Math.random() < 0.002) {
+        const pool = AGENT_DATA[this.id].dialogues;
+        if (pool && pool.length) {
+          this.say(pool[Math.floor(Math.random() * pool.length)], 3.5);
         }
       }
-    });
-
-    document.querySelectorAll('.agent-pill').forEach(pill => {
-      pill.addEventListener('click', () => {
-        showAgent(pill.dataset.agent);
-      });
-    });
-
-    document.getElementById('btn-close-card').addEventListener('click', () => {
-      cardEl.classList.remove('open');
-      bubbleEl.classList.remove('visible');
-    });
-
-    document.getElementById('btn-reset').addEventListener('click', () => {
-      new TWEEN.Tween(camera.position).to({ x: 16, y: 14, z: 18 }, 700).easing(TWEEN.Easing.Cubic.Out).start();
-      new TWEEN.Tween(controls.target).to({ x: 0, y: 1, z: 0 }, 700).easing(TWEEN.Easing.Cubic.Out).start();
-      cardEl.classList.remove('open');
-      bubbleEl.classList.remove('visible');
-    });
-
-    // Pixel Size Toggle (2x -> 3.5x -> 5x)
-    const btnPixel = document.getElementById('btn-pixel');
-    const pixelModes = [
-      { scale: 2.0, label: '👾 도트: 2x (선명)' },
-      { scale: 3.5, label: '👾 도트: 3.5x (표준)' },
-      { scale: 5.0, label: '👾 도트: 5x (굵음)' }
-    ];
-    let pixelModeIdx = 1;
-
-    btnPixel.addEventListener('click', () => {
-      pixelModeIdx = (pixelModeIdx + 1) % pixelModes.length;
-      pixelScale = pixelModes[pixelModeIdx].scale;
-      btnPixel.textContent = pixelModes[pixelModeIdx].label;
-      updateRendererSize();
-    });
-
-    // Theme Toggle
-    const btnTheme = document.getElementById('btn-theme');
-    let isDark = false;
-    btnTheme.addEventListener('click', () => {
-      isDark = !isDark;
-      document.body.classList.toggle('dark', isDark);
-      btnTheme.textContent = isDark ? '☀️' : '🌙';
-
-      const targetBg = isDark ? 0x101413 : 0xF5EFE6;
-      const targetAmb = isDark ? 0x485550 : 0xFFF9F0;
-      scene.background.setHex(targetBg);
-      ambientLight.color.setHex(targetAmb);
-      sunLight.intensity = isDark ? 0.6 : 1.35;
-    });
-
-    window.addEventListener('resize', updateRendererSize);
-
-    setTimeout(() => {
-      showAgent('pickle');
-    }, 400);
-
-    // Render Loop
-    let clock = new THREE.Clock();
-    function animate() {
-      requestAnimationFrame(animate);
-      TWEEN.update();
-      controls.update();
-
-      const time = clock.getElapsedTime();
-      Object.keys(agentMeshes).forEach((key, idx) => {
-        const m = agentMeshes[key];
-        m.children[0].scale.y = 1 + Math.sin(time * 2.5 + idx) * 0.03;
-      });
-
-      updateBubblePosition();
-      renderer.render(scene, camera);
     }
-    animate();
-  </script>
+  }
+
+  draw(ctx) {
+    const img = spriteImages[this.id];
+    if (!img || !img.complete) return;
+
+    ctx.save();
+
+    // Bobbing animation
+    let bobY = 0;
+    if (this.isMoving) {
+      bobY = Math.abs(Math.sin(this.walkTimer)) * -6;
+    } else {
+      bobY = Math.sin(this.idleTimer * 2.5) * -2;
+    }
+
+    const drawX = Math.round(this.x);
+    const drawY = Math.round(this.y + bobY);
+
+    // Drop shadow under feet
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+    ctx.beginPath();
+    ctx.ellipse(drawX, drawY, 18, 7, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Sprite drawing with horizontal flip
+    ctx.translate(drawX, drawY);
+    ctx.scale(this.facing, 1);
+    ctx.drawImage(img, -img.width / 2, -img.height);
+    ctx.restore();
+
+    // Name badge above head
+    this.drawBadge(ctx, drawX, drawY - img.height + bobY);
+
+    // Speech bubble
+    if (this.bubbleText) {
+      this.drawSpeechBubble(ctx, drawX, drawY - img.height + bobY - 24, this.bubbleText);
+    }
+  }
+
+  drawBadge(ctx, x, y) {
+    ctx.save();
+    ctx.font = 'bold 11px Galmuri11, monospace';
+    const text = this.tag;
+    const textWidth = ctx.measureText(text).width;
+    const padX = 6;
+    const h = 16;
+    const w = textWidth + padX * 2;
+    const bx = Math.round(x - w / 2);
+    const by = Math.round(y - h - 4);
+
+    // Black border & shadow
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(bx - 1, by - 1, w + 2, h + 2);
+    ctx.fillRect(bx + 2, by + 2, w, h);
+
+    // Badge background
+    ctx.fillStyle = this.badgeBg;
+    ctx.fillRect(bx, by, w, h);
+
+    // Badge text
+    ctx.fillStyle = '#ffffff';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text, bx + padX, by + h / 2 + 1);
+    ctx.restore();
+  }
+
+  drawSpeechBubble(ctx, x, y, text) {
+    ctx.save();
+    ctx.font = '11px Galmuri11, monospace';
+    const textWidth = ctx.measureText(text).width;
+    const pad = 8;
+    const w = Math.min(260, textWidth + pad * 2);
+    const h = 24;
+    const bx = Math.round(x - w / 2);
+    const by = Math.round(y - h - 10);
+
+    // Shadow
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+    ctx.fillRect(bx + 3, by + 3, w, h);
+
+    // Bubble body
+    ctx.fillStyle = '#ffffff';
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 2;
+    ctx.fillRect(bx, by, w, h);
+    ctx.strokeRect(bx, by, w, h);
+
+    // Tail
+    ctx.beginPath();
+    ctx.moveTo(x - 5, by + h);
+    ctx.lineTo(x, by + h + 6);
+    ctx.lineTo(x + 5, by + h);
+    ctx.fillStyle = '#ffffff';
+    ctx.fill();
+    ctx.stroke();
+
+    // Text
+    ctx.fillStyle = '#111111';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text, bx + pad, by + h / 2 + 1);
+    ctx.restore();
+  }
+}
+
+// 4. Instantiate Entities
+const entities = {
+  pickle: new Entity(AGENT_DATA.pickle),
+  muse: new Entity(AGENT_DATA.muse),
+  genspark: new Entity(AGENT_DATA.genspark),
+  chatgpt: new Entity(AGENT_DATA.chatgpt),
+  boss: new Entity(AGENT_DATA.boss, true) // Player
+};
+
+// 5. Camera & Viewport Engine
+let camera = {
+  x: MAP_WIDTH / 2,
+  y: MAP_HEIGHT / 2,
+  targetX: MAP_WIDTH / 2,
+  targetY: MAP_HEIGHT / 2,
+  zoom: 1.0,
+  targetZoom: 1.0,
+  followBoss: false
+};
+
+let clickTargetMarker = null;
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  ctx.imageSmoothingEnabled = false;
+
+  // Initial fit to screen
+  if (!camera.followBoss && camera.targetZoom === 1.0) {
+    fitMapToScreen();
+  }
+}
+window.addEventListener('resize', resizeCanvas);
+
+function fitMapToScreen() {
+  const scaleX = window.innerWidth / MAP_WIDTH;
+  const scaleY = window.innerHeight / MAP_HEIGHT;
+  camera.targetZoom = Math.min(scaleX, scaleY) * 0.95;
+  camera.targetX = MAP_WIDTH / 2;
+  camera.targetY = MAP_HEIGHT / 2;
+  camera.followBoss = false;
+  showToast('🔍 화면 크기에 맞춤');
+}
+
+// 6. Interaction & Input Handling
+let isDragging = false;
+let dragStartX = 0;
+let dragStartY = 0;
+let cameraStartX = 0;
+let cameraStartY = 0;
+
+function screenToWorld(sx, sy) {
+  const cx = window.innerWidth / 2;
+  const cy = window.innerHeight / 2;
+  const wx = (sx - cx) / camera.zoom + camera.x;
+  const wy = (sy - cy) / camera.zoom + camera.y;
+  return { x: wx, y: wy };
+}
+
+// Mouse & Touch events
+const container = document.getElementById('game-container');
+
+container.addEventListener('pointerdown', (e) => {
+  if (e.target.closest('header, .bottom-bar, #detail-drawer, #mobile-dpad')) return;
+  isDragging = false;
+  dragStartX = e.clientX;
+  dragStartY = e.clientY;
+  cameraStartX = camera.x;
+  cameraStartY = camera.y;
+});
+
+container.addEventListener('pointermove', (e) => {
+  if (dragStartX === 0 && dragStartY === 0) return;
+  const dx = e.clientX - dragStartX;
+  const dy = e.clientY - dragStartY;
+  if (Math.hypot(dx, dy) > 8) {
+    isDragging = true;
+    camera.followBoss = false;
+    camera.targetX = cameraStartX - dx / camera.zoom;
+    camera.targetY = cameraStartY - dy / camera.zoom;
+  }
+});
+
+container.addEventListener('pointerup', (e) => {
+  if (e.target.closest('header, .bottom-bar, #detail-drawer, #mobile-dpad')) return;
+
+  if (!isDragging) {
+    const worldPos = screenToWorld(e.clientX, e.clientY);
+
+    // Check if clicked an agent
+    let clickedAgent = null;
+    for (const id of ['pickle', 'muse', 'genspark', 'chatgpt']) {
+      const ent = entities[id];
+      const dist = Math.hypot(worldPos.x - ent.x, worldPos.y - (ent.y - 40));
+      if (dist < 40) {
+        clickedAgent = id;
+        break;
+      }
+    }
+
+    if (clickedAgent) {
+      openDetailDrawer(clickedAgent);
+      play8BitSound('click');
+    } else {
+      // Move Boss (Player)
+      entities.boss.moveTo(worldPos.x, worldPos.y);
+      clickTargetMarker = { x: worldPos.x, y: worldPos.y, timer: 0.6 };
+      play8BitSound('click');
+    }
+  }
+
+  dragStartX = 0;
+  dragStartY = 0;
+  isDragging = false;
+});
+
+// Wheel zoom
+container.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  const zoomFactor = e.deltaY < 0 ? 1.15 : 0.87;
+  camera.targetZoom = Math.max(0.4, Math.min(2.5, camera.targetZoom * zoomFactor));
+}, { passive: false });
+
+// Keyboard controls
+const keys = {};
+window.addEventListener('keydown', (e) => {
+  keys[e.key] = true;
+  if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) {
+    e.preventDefault();
+  }
+  if (e.key === ' ') {
+    checkProximityInteraction();
+  }
+});
+window.addEventListener('keyup', (e) => {
+  keys[e.key] = false;
+});
+
+// Mobile D-Pad
+function setupDpadButton(btnId, vx, vy) {
+  const btn = document.getElementById(btnId);
+  let interval = null;
+  const start = () => {
+    if (interval) return;
+    interval = setInterval(() => {
+      entities.boss.x += vx * 12;
+      entities.boss.y += vy * 12;
+      entities.boss.targetX = entities.boss.x;
+      entities.boss.targetY = entities.boss.y;
+      entities.boss.isMoving = true;
+      entities.boss.facing = vx >= 0 ? 1 : -1;
+      play8BitSound('step');
+    }, 40);
+  };
+  const end = () => {
+    clearInterval(interval);
+    interval = null;
+    entities.boss.isMoving = false;
+  };
+  btn.addEventListener('pointerdown', start);
+  btn.addEventListener('pointerup', end);
+  btn.addEventListener('pointercancel', end);
+  btn.addEventListener('pointerleave', end);
+}
+setupDpadButton('dpad-up', 0, -1);
+setupDpadButton('dpad-down', 0, 1);
+setupDpadButton('dpad-left', -1, 0);
+setupDpadButton('dpad-right', 1, 0);
+
+// 7. Team Modes
+function setTeamMode(mode) {
+  play8BitSound('fanfare');
+  if (mode === 'desks') {
+    entities.pickle.moveTo(AGENT_DATA.pickle.homePos.x, AGENT_DATA.pickle.homePos.y);
+    entities.muse.moveTo(AGENT_DATA.muse.homePos.x, AGENT_DATA.muse.homePos.y);
+    entities.genspark.moveTo(AGENT_DATA.genspark.homePos.x, AGENT_DATA.genspark.homePos.y);
+    entities.chatgpt.moveTo(AGENT_DATA.chatgpt.homePos.x, AGENT_DATA.chatgpt.homePos.y);
+    entities.pickle.say('각자 자리로 복귀! 열일 모드 돌입합니다 💻');
+    showToast('🏢 전원 데스크 복귀');
+  } else if (mode === 'meeting') {
+    entities.pickle.moveTo(AGENT_DATA.pickle.meetingPos.x, AGENT_DATA.pickle.meetingPos.y);
+    entities.muse.moveTo(AGENT_DATA.muse.meetingPos.x, AGENT_DATA.muse.meetingPos.y);
+    entities.genspark.moveTo(AGENT_DATA.genspark.meetingPos.x, AGENT_DATA.genspark.meetingPos.y);
+    entities.chatgpt.moveTo(AGENT_DATA.chatgpt.meetingPos.x, AGENT_DATA.chatgpt.meetingPos.y);
+    entities.muse.say('회의실 집결! 오늘의 아젠다를 논의합시다 📊');
+    showToast('📊 회의실 소집 완료');
+  } else if (mode === 'coffee') {
+    entities.pickle.moveTo(AGENT_DATA.pickle.coffeePos.x, AGENT_DATA.pickle.coffeePos.y);
+    entities.muse.moveTo(AGENT_DATA.muse.coffeePos.x, AGENT_DATA.muse.coffeePos.y);
+    entities.genspark.moveTo(AGENT_DATA.genspark.coffeePos.x, AGENT_DATA.genspark.coffeePos.y);
+    entities.chatgpt.moveTo(AGENT_DATA.chatgpt.coffeePos.x, AGENT_DATA.chatgpt.coffeePos.y);
+    entities.pickle.say('탕비실 티타임! 맥심 골드 4포 탑승 ☕');
+    showToast('☕ 탕비실 티타임 모드');
+  } else if (mode === 'lounge') {
+    entities.pickle.moveTo(AGENT_DATA.pickle.loungePos.x, AGENT_DATA.pickle.loungePos.y);
+    entities.muse.moveTo(AGENT_DATA.muse.loungePos.x, AGENT_DATA.muse.loungePos.y);
+    entities.genspark.moveTo(AGENT_DATA.genspark.loungePos.x, AGENT_DATA.genspark.loungePos.y);
+    entities.chatgpt.moveTo(AGENT_DATA.chatgpt.loungePos.x, AGENT_DATA.chatgpt.loungePos.y);
+    entities.muse.say('라운지에서 잠깐 충전하고 마감 달립시다 🛋️');
+    showToast('🛋️ 휴게 라운지 휴식 모드');
+  }
+}
+
+document.getElementById('mode-desks').addEventListener('click', () => setTeamMode('desks'));
+document.getElementById('mode-meeting').addEventListener('click', () => setTeamMode('meeting'));
+document.getElementById('mode-coffee').addEventListener('click', () => setTeamMode('coffee'));
+document.getElementById('mode-lounge').addEventListener('click', () => setTeamMode('lounge'));
+
+// 8. Drawer & UI Logic
+let currentSelectedAgent = 'pickle';
+const drawer = document.getElementById('detail-drawer');
+
+function openDetailDrawer(agentId) {
+  currentSelectedAgent = agentId;
+  const data = AGENT_DATA[agentId];
+  if (!data) return;
+
+  document.getElementById('drawer-avatar-img').src = data.spriteSrc;
+  document.getElementById('drawer-name').textContent = data.name;
+  document.getElementById('drawer-role').textContent = data.role;
+  document.getElementById('drawer-status').textContent = data.status;
+  document.getElementById('drawer-quote').textContent = data.quote;
+  document.getElementById('drawer-desc').textContent = data.desc;
+
+  const itemsContainer = document.getElementById('drawer-items');
+  itemsContainer.innerHTML = '';
+  data.items.forEach(item => {
+    const span = document.createElement('span');
+    span.className = 'item-tag';
+    span.textContent = item;
+    itemsContainer.appendChild(span);
+  });
+
+  drawer.classList.add('open');
+  showToast(`${data.name} 정보 열람`);
+}
+
+document.getElementById('btn-close-drawer').addEventListener('click', () => {
+  drawer.classList.remove('open');
+});
+
+document.getElementById('btn-talk-action').addEventListener('click', () => {
+  const agent = entities[currentSelectedAgent];
+  if (agent) {
+    const pool = AGENT_DATA[currentSelectedAgent].dialogues;
+    const text = pool[Math.floor(Math.random() * pool.length)];
+    agent.say(text, 4.5);
+  }
+});
+
+document.getElementById('btn-call-boss').addEventListener('click', () => {
+  const agent = entities[currentSelectedAgent];
+  if (agent) {
+    agent.moveTo(entities.boss.x + (Math.random() * 60 - 30), entities.boss.y + 40);
+    agent.say('사장님! 부르셔서 달려왔습니다! 🏃', 4.0);
+    showToast(`${agent.name} 호출 완료`);
+  }
+});
+
+document.querySelectorAll('.agent-pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    const agentId = pill.dataset.agent;
+    openDetailDrawer(agentId);
+    // Pan to agent
+    const ent = entities[agentId];
+    camera.targetX = ent.x;
+    camera.targetY = ent.y;
+    camera.followBoss = false;
+  });
+});
+
+document.getElementById('btn-zoom-boss').addEventListener('click', () => {
+  camera.targetX = entities.boss.x;
+  camera.targetY = entities.boss.y;
+  camera.targetZoom = 1.35;
+  camera.followBoss = true;
+  play8BitSound('click');
+  showToast('👤 사장님 추적 모드');
+});
+
+document.getElementById('btn-fit').addEventListener('click', fitMapToScreen);
+
+document.getElementById('btn-sound').addEventListener('click', function() {
+  soundEnabled = !soundEnabled;
+  this.textContent = soundEnabled ? '🔊 효과음' : '🔇 음소거';
+  this.classList.toggle('active', soundEnabled);
+  if (soundEnabled) play8BitSound('click');
+});
+
+function showToast(msg) {
+  const toast = document.getElementById('toast-msg');
+  toast.textContent = msg;
+  toast.style.display = 'block';
+  clearTimeout(toast._timeout);
+  toast._timeout = setTimeout(() => {
+    toast.style.display = 'none';
+  }, 2200);
+}
+
+// Proximity Interaction
+let lastNearbyAgent = null;
+function checkProximity() {
+  const boss = entities.boss;
+  let nearest = null;
+  let minDist = 95;
+
+  for (const id of ['pickle', 'muse', 'genspark', 'chatgpt']) {
+    const ent = entities[id];
+    const dist = Math.hypot(boss.x - ent.x, boss.y - ent.y);
+    if (dist < minDist) {
+      nearest = ent;
+      minDist = dist;
+    }
+  }
+
+  if (nearest && nearest !== lastNearbyAgent) {
+    play8BitSound('chime');
+    nearest.facing = boss.x >= nearest.x ? 1 : -1;
+    const pool = AGENT_DATA[nearest.id].dialogues;
+    nearest.say(pool[0], 4.0);
+    lastNearbyAgent = nearest;
+  } else if (!nearest) {
+    lastNearbyAgent = null;
+  }
+}
+
+function checkProximityInteraction() {
+  if (lastNearbyAgent) {
+    openDetailDrawer(lastNearbyAgent.id);
+  }
+}
+
+// 9. Main Game Loop
+let lastTime = performance.now();
+
+function gameLoop(now) {
+  const dt = Math.min(0.1, (now - lastTime) / 1000);
+  lastTime = now;
+
+  // Keyboard movement for boss
+  let kx = 0;
+  let ky = 0;
+  if (keys['ArrowUp'] || keys['w'] || keys['W']) ky -= 1;
+  if (keys['ArrowDown'] || keys['s'] || keys['S']) ky += 1;
+  if (keys['ArrowLeft'] || keys['a'] || keys['A']) kx -= 1;
+  if (keys['ArrowRight'] || keys['d'] || keys['D']) kx += 1;
+
+  if (kx !== 0 || ky !== 0) {
+    const mag = Math.hypot(kx, ky);
+    entities.boss.x += (kx / mag) * entities.boss.speed * dt;
+    entities.boss.y += (ky / mag) * entities.boss.speed * dt;
+    entities.boss.targetX = entities.boss.x;
+    entities.boss.targetY = entities.boss.y;
+    entities.boss.isMoving = true;
+    entities.boss.facing = kx !== 0 ? (kx > 0 ? 1 : -1) : entities.boss.facing;
+    entities.boss.walkTimer += dt * 8;
+    camera.followBoss = true;
+
+    if (Math.sin(entities.boss.walkTimer * 2) > 0.95) {
+      play8BitSound('step');
+    }
+  }
+
+  // Update entities
+  Object.values(entities).forEach(e => e.update(dt));
+  checkProximity();
+
+  // Smooth camera interpolation
+  if (camera.followBoss) {
+    camera.targetX = entities.boss.x;
+    camera.targetY = entities.boss.y;
+  }
+  camera.x += (camera.targetX - camera.x) * 0.12;
+  camera.y += (camera.targetY - camera.y) * 0.12;
+  camera.zoom += (camera.targetZoom - camera.zoom) * 0.12;
+
+  // Render Scene
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.save();
+
+  // Camera transform (centered)
+  ctx.translate(canvas.width / 2, canvas.height / 2);
+  ctx.scale(camera.zoom, camera.zoom);
+  ctx.translate(-camera.x, -camera.y);
+
+  // 1. Draw Map Background
+  if (mapImage.complete) {
+    ctx.drawImage(mapImage, 0, 0, MAP_WIDTH, MAP_HEIGHT);
+  }
+
+  // 2. Draw Click Marker
+  if (clickTargetMarker && clickTargetMarker.timer > 0) {
+    clickTargetMarker.timer -= dt;
+    const progress = 1 - (clickTargetMarker.timer / 0.6);
+    ctx.strokeStyle = '#f1c40f';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(clickTargetMarker.x, clickTargetMarker.y, 8 + progress * 16, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+
+  // 3. Draw Entities (Y-sorted for natural occlusion)
+  const sortedEntities = Object.values(entities).sort((a, b) => a.y - b.y);
+  sortedEntities.forEach(e => e.draw(ctx));
+
+  ctx.restore();
+  requestAnimationFrame(gameLoop);
+}
+
+// Start
+mapImage.onload = () => {
+  resizeCanvas();
+  fitMapToScreen();
+  requestAnimationFrame(gameLoop);
+};
+if (mapImage.complete) {
+  resizeCanvas();
+  fitMapToScreen();
+  requestAnimationFrame(gameLoop);
+}
+</script>
+
 </body>
 </html>
