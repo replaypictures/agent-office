@@ -1,0 +1,2530 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ReplayPictures Lo-Fi Office FM 🎵 Claude Style 2.5D Pilot</title>
+  <style>
+    :root {
+      --bg-dark: #0f111a;
+      --card-bg: rgba(26, 29, 45, 0.85);
+      --accent: #5e81ac;
+      --accent-warm: #d08770;
+      --accent-green: #a3be8c;
+      --accent-pink: #b48ead;
+      --accent-yellow: #ebcb8b;
+      --text: #eceff4;
+      --text-muted: #98a2b3;
+      --border: rgba(255, 255, 255, 0.12);
+      --glow: rgba(94, 129, 172, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      background: var(--bg-dark);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Pretendard", sans-serif;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* TOP HEADER */
+    header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(180deg, rgba(15,17,26,0.95) 0%, rgba(15,17,26,0) 100%);
+      z-index: 50;
+      pointer-events: auto;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: -0.3px;
+    }
+
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      background: #ff5555;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #ff5555;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    .status-badge {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      border-radius: 14px;
+      font-size: 12px;
+      color: var(--accent-yellow);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .info-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* MAIN VIEWPORT (VIRTUAL CAMERA) */
+    #viewport {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+      background: radial-gradient(circle at 50% 40%, #1a1e30 0%, #0d0e17 100%);
+      cursor: grab;
+    }
+
+    #viewport.dragging {
+      cursor: grabbing;
+    }
+
+    #camera-stage {
+      width: 1920px;
+      height: 1080px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      margin-left: -960px;
+      margin-top: -540px;
+      transform-origin: 50% 50%;
+      transition: transform 1.8s cubic-bezier(0.2, 0.9, 0.3, 1);
+      transform-style: preserve-3d;
+    }
+
+    /* 2.5D ROOM LAYERS */
+    .room-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    /* LAYER 1: BACK WALL & WINDOWS */
+    .layer-back {
+      z-index: 1;
+    }
+
+    .back-wall {
+      position: absolute;
+      top: 60px;
+      left: 120px;
+      width: 1680px;
+      height: 580px;
+      background: linear-gradient(180deg, #1f2438 0%, #151928 100%);
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    }
+
+    /* RAINY WINDOW */
+    .window-frame {
+      position: absolute;
+      top: 40px;
+      left: 80px;
+      width: 380px;
+      height: 480px;
+      background: #090b12;
+      border: 10px solid #2d334d;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: inset 0 0 40px rgba(0,0,0,0.8), 0 0 30px rgba(100, 149, 237, 0.15);
+    }
+
+    .city-backdrop {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(180deg, #121626 0%, #20273f 60%, #151824 100%);
+      position: relative;
+    }
+
+    .rain-canvas {
+      position: absolute;
+      inset: 0;
+      opacity: 0.6;
+    }
+
+    .window-cross {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      pointer-events: none;
+    }
+    .window-cross::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 6px;
+      background: #2d334d;
+    }
+    .window-cross::after {
+      content: '';
+      position: absolute;
+      height: 100%;
+      width: 6px;
+      background: #2d334d;
+    }
+
+    /* NEON SIGN */
+    .neon-logo {
+      position: absolute;
+      top: 50px;
+      left: 540px;
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: #88c0d0;
+      text-shadow: 0 0 10px rgba(136, 192, 208, 0.8), 0 0 30px rgba(136, 192, 208, 0.4);
+      opacity: 0.85;
+    }
+    .neon-sub {
+      font-size: 11px;
+      letter-spacing: 4px;
+      color: var(--accent-pink);
+      display: block;
+      margin-top: 4px;
+      text-shadow: 0 0 8px rgba(180, 142, 173, 0.6);
+    }
+
+    /* LARGE WALL SCREEN (COMIC PROJECTION) */
+    .large-wall-screen {
+      position: absolute;
+      top: 110px;
+      left: 1020px;
+      width: 680px;
+      height: 440px;
+      background: #080a10;
+      border: 8px solid #282c3f;
+      border-radius: 12px;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.6), 0 0 40px var(--glow);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.8s ease;
+    }
+
+    .screen-header {
+      height: 32px;
+      background: #181b28;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .screen-badge {
+      color: var(--accent-green);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .screen-content {
+      flex: 1;
+      position: relative;
+      background: #05060a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .screen-comic-img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      opacity: 0;
+      transform: scale(0.96);
+      transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .screen-comic-img.active {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .screen-standby {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #4c566a;
+      font-size: 13px;
+      gap: 10px;
+      transition: opacity 0.5s ease;
+    }
+
+    .screen-standby.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* LAYER 2: FLOOR & FURNITURE */
+    .layer-mid {
+      z-index: 10;
+    }
+
+    .parquet-floor {
+      position: absolute;
+      top: 600px;
+      left: 100px;
+      width: 1720px;
+      height: 440px;
+      background: 
+        radial-gradient(ellipse at 50% 20%, rgba(208, 135, 112, 0.12) 0%, rgba(0,0,0,0) 70%),
+        linear-gradient(135deg, #241c19 25%, #2c221f 25%, #2c221f 50%, #241c19 50%, #241c19 75%, #2c221f 75%, #2c221f 100%);
+      background-size: 100% 100%, 60px 60px;
+      border-radius: 20px;
+      box-shadow: inset 0 20px 40px rgba(0,0,0,0.8);
+    }
+
+    /* WORKSTATIONS (DESKS) */
+    .desk-group {
+      position: absolute;
+      top: 550px;
+      left: 240px;
+      width: 760px;
+      height: 280px;
+      display: flex;
+      gap: 40px;
+    }
+
+    .desk {
+      flex: 1;
+      background: linear-gradient(180deg, #373e4f 0%, #2b3140 100%);
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      position: relative;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+      padding: 16px;
+    }
+
+    .desk-top {
+      position: absolute;
+      top: -20px;
+      left: 0;
+      right: 0;
+      height: 30px;
+      background: #434c5e;
+      border-radius: 8px 8px 0 0;
+      border-bottom: 2px solid #2e3440;
+    }
+
+    .monitor {
+      width: 120px;
+      height: 80px;
+      background: #1e222d;
+      border: 4px solid #2e3440;
+      border-radius: 6px;
+      margin: 10px auto 0;
+      position: relative;
+      box-shadow: 0 0 20px rgba(136, 192, 208, 0.2);
+      overflow: hidden;
+    }
+    .monitor::after {
+      content: '';
+      position: absolute;
+      bottom: -15px;
+      left: 45px;
+      width: 30px;
+      height: 15px;
+      background: #2e3440;
+    }
+
+    .monitor-code {
+      font-family: monospace;
+      font-size: 7px;
+      color: #a3be8c;
+      padding: 6px;
+      line-height: 1.3;
+      opacity: 0.8;
+      animation: codeFlicker 4s infinite alternate;
+    }
+
+    @keyframes codeFlicker {
+      0% { opacity: 0.6; }
+      100% { opacity: 0.95; }
+    }
+
+    .coffee-mug {
+      width: 16px;
+      height: 22px;
+      background: #ebcb8b;
+      border-radius: 2px 2px 5px 5px;
+      position: absolute;
+      bottom: 40px;
+      right: 25px;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+    }
+    .coffee-mug::before {
+      content: '☕';
+      font-size: 8px;
+      position: absolute;
+      top: 4px;
+      left: 3px;
+    }
+    .coffee-steam {
+      position: absolute;
+      top: -15px;
+      left: 4px;
+      font-size: 10px;
+      opacity: 0.5;
+      animation: steam 2.5s infinite;
+    }
+    @keyframes steam {
+      0% { transform: translateY(0) scale(0.8); opacity: 0; }
+      50% { opacity: 0.6; }
+      100% { transform: translateY(-12px) scale(1.2); opacity: 0; }
+    }
+
+    /* LAYER 3: AGENTS & SPEECH BUBBLES */
+    .layer-front {
+      z-index: 20;
+    }
+
+    .agent-wrapper {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: all 0.5s ease;
+    }
+
+    /* PICKLE */
+    #agent-pickle {
+      top: 590px;
+      left: 330px;
+    }
+
+    /* MUSE */
+    #agent-muse {
+      top: 590px;
+      left: 560px;
+    }
+
+    /* GENSPARK */
+    #agent-genspark {
+      top: 590px;
+      left: 800px;
+    }
+
+    .agent-avatar {
+      width: 72px;
+      height: 110px;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center bottom;
+      filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5));
+      animation: idleBreathe 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes idleBreathe {
+      0% { transform: translateY(0px) scale(1); }
+      100% { transform: translateY(-4px) scale(1.02); }
+    }
+
+    .agent-name-tag {
+      background: rgba(15, 17, 26, 0.85);
+      border: 1px solid var(--border);
+      padding: 3px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-top: 4px;
+      color: var(--text);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    }
+
+    /* DIALOGUE SPEECH BUBBLE */
+    .speech-bubble {
+      position: absolute;
+      bottom: 120px;
+      background: #ffffff;
+      color: #1e222d;
+      padding: 12px 18px;
+      border-radius: 16px;
+      border-bottom-left-radius: 4px;
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.45;
+      max-width: 320px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.4), 0 0 20px rgba(255,255,255,0.3);
+      opacity: 0;
+      transform: translateY(12px) scale(0.9);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    .speech-bubble.active {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    .speech-bubble::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 18px;
+      width: 0;
+      height: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-top: 8px solid #ffffff;
+    }
+
+    .speech-speaker {
+      font-size: 11px;
+      font-weight: 700;
+      color: #5e81ac;
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    /* FLOATING BOTTOM CONTROLLER */
+    footer {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 48px);
+      max-width: 960px;
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 14px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+      z-index: 60;
+    }
+
+    .timeline-bar-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      width: 100%;
+    }
+
+    .time-display {
+      font-family: monospace;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent-yellow);
+      min-width: 95px;
+    }
+
+    .timeline-scrubber-container {
+      flex: 1;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .timeline-progress {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent) 0%, var(--accent-green) 100%);
+      border-radius: 4px;
+      width: 0%;
+      position: relative;
+      transition: width 0.1s linear;
+    }
+
+    .timeline-thumb {
+      width: 16px;
+      height: 16px;
+      background: #ffffff;
+      border: 3px solid var(--accent);
+      border-radius: 50%;
+      position: absolute;
+      right: -8px;
+      top: -4px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    }
+
+    /* TIMELINE MARKERS */
+    .timeline-marker {
+      position: absolute;
+      top: -3px;
+      width: 3px;
+      height: 14px;
+      background: var(--accent-yellow);
+      border-radius: 2px;
+      transform: translateX(-50%);
+      pointer-events: none;
+      opacity: 0.7;
+    }
+
+    .controls-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .controls-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-ctrl {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-ctrl:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.25);
+      transform: translateY(-1px);
+    }
+
+    .btn-ctrl.primary {
+      background: var(--accent);
+      color: #ffffff;
+      border: none;
+      box-shadow: 0 4px 12px rgba(94, 129, 172, 0.4);
+    }
+
+    .btn-ctrl.active {
+      background: var(--accent-green);
+      color: #1a1e2a;
+      border-color: var(--accent-green);
+    }
+
+    .scene-navigator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-scene {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.08);
+      color: var(--text-muted);
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-scene:hover, .btn-scene.active {
+      color: var(--text);
+      background: rgba(255,255,255,0.08);
+      border-color: var(--accent);
+    }
+
+    .audio-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .volume-slider {
+      width: 70px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    /* EVENT NOTIFIER OVERLAY */
+    .event-toast {
+      position: absolute;
+      top: 75px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(20, 24, 38, 0.9);
+      border: 1px solid var(--accent);
+      padding: 8px 18px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 55;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      pointer-events: none;
+    }
+    .event-toast.visible {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="brand">
+      <div class="live-dot"></div>
+      <span>ReplayPictures Lo-Fi Office FM 🎵</span>
+      <span class="status-badge" id="mode-badge">🎬 관찰 모드 (Ambient Walk)</span>
+    </div>
+    <div class="info-right">
+      <a href="office_2d.html" style="color: #88c0d0; text-decoration: none; font-size: 11px; padding: 4px 8px; border: 1px solid rgba(136,192,208,0.4); border-radius: 4px; background: rgba(0,0,0,0.3);">🕹️ 2D 오피스</a>
+      <span>🌧️ 인천 미추홀구 11°C</span>
+      <span id="clock-display">21:30 목</span>
+      <button class="btn-ctrl" id="btn-fullscreen" style="padding: 4px 10px; font-size: 11px;">전체화면</button>
+    </div>
+  </header>
+
+  <!-- EVENT TOAST -->
+  <div class="event-toast" id="event-toast">
+    <span>💡</span>
+    <span id="toast-text">타임라인 이벤트 로드 중...</span>
+  </div>
+
+  <!-- VIEWPORT -->
+  <main id="viewport">
+    <div id="camera-stage">
+      
+      <!-- LAYER 1: BACK WALL & WINDOW -->
+      <div class="room-layer layer-back">
+        <div class="back-wall">
+          <!-- RAINY WINDOW -->
+          <div class="window-frame">
+            <div class="city-backdrop">
+              <canvas id="rain-canvas" class="rain-canvas"></canvas>
+            </div>
+            <div class="window-cross"></div>
+          </div>
+
+          <!-- NEON SIGN -->
+          <div class="neon-logo">
+            REPLAY PICTURES
+            <span class="neon-sub">2.5D AGENT CREATIVE LAB</span>
+          </div>
+
+          <!-- LARGE WALL SCREEN -->
+          <div class="large-wall-screen" id="wall-screen">
+            <div class="screen-header">
+              <span class="screen-badge" id="screen-status-badge">● ON AIR (전편 69컷)</span>
+              <span id="screen-cut-title" style="flex: 1; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 8px;">1화 01컷: 새벽 6시의 알람</span>
+              <div class="screen-nav-buttons" style="display: flex; gap: 4px; align-items: center;">
+                <button id="btn-cut-prev" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 4px; padding: 1px 6px; cursor: pointer; font-size: 10px;">◀</button>
+                <span id="screen-cut-counter" style="color: var(--accent-yellow); font-family: monospace; font-size: 11px;">01/69</span>
+                <button id="btn-cut-next" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 4px; padding: 1px 6px; cursor: pointer; font-size: 10px;">▶</button>
+              </div>
+            </div>
+            <div class="screen-content">
+              <div class="screen-standby hidden" id="screen-standby">
+                <span style="font-size: 28px;">📺</span>
+                <span>에이전트 만화 제작 모니터링 준비 완료</span>
+                <span style="font-size: 11px; opacity: 0.6;">타임라인 이벤트 발생 시 컷이 점등됩니다</span>
+              </div>
+              <img id="screen-img" class="screen-comic-img active" src="cuts/ep01/01_cut01.png" alt="Webtoon Cut">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LAYER 2: FLOOR & DESKS -->
+      <div class="room-layer layer-mid">
+        <div class="parquet-floor"></div>
+
+        <div class="desk-group">
+          <!-- PICKLE DESK -->
+          <div class="desk" id="desk-pickle">
+            <div class="desk-top"></div>
+            <div class="monitor">
+              <div class="monitor-code">
+                &gt; pickle --webtoon<br>
+                &gt; QC: 100% PASSED<br>
+                &gt; RESOLUTION: 1080px<br>
+                &gt; DEADZONE: SAFE<br>
+                &gt; RUNNING 2.5D PILOT...
+              </div>
+            </div>
+            <div class="coffee-mug">
+              <div class="coffee-steam">~</div>
+            </div>
+          </div>
+
+          <!-- MUSE DESK -->
+          <div class="desk" id="desk-muse">
+            <div class="desk-top"></div>
+            <div class="monitor" style="box-shadow: 0 0 20px rgba(180, 142, 173, 0.3);">
+              <div class="monitor-code" style="color: #b48ead;">
+                &gt; muse --canvas<br>
+                &gt; BRUSH: G-PEN 4.0<br>
+                &gt; CUT: 01_STORYBOARD<br>
+                &gt; BGM_PILOT: 75 BPM<br>
+                &gt; AMBIENT VIBES ON
+              </div>
+            </div>
+          </div>
+
+          <!-- GENSPARK DESK -->
+          <div class="desk" id="desk-genspark">
+            <div class="desk-top"></div>
+            <div class="monitor" style="box-shadow: 0 0 20px rgba(235, 203, 139, 0.3);">
+              <div class="monitor-code" style="color: #ebcb8b;">
+                &gt; genspark --stream<br>
+                &gt; TIMELINE: 300s<br>
+                &gt; CAMERA: ORCHESTRATED<br>
+                &gt; LOFI LOOP: READY<br>
+                &gt; SYNC STATUS: OK
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LAYER 3: AGENTS & SPEECH BUBBLES -->
+      <div class="room-layer layer-front">
+        
+        <!-- PICKLE -->
+        <div class="agent-wrapper" id="agent-pickle">
+          <div class="speech-bubble" id="bubble-pickle">
+            <span class="speech-speaker">🥒 피클</span>
+            <span class="speech-text"></span>
+          </div>
+          <div class="agent-avatar" style="background-image: url('sprite_pickle.png');"></div>
+          <div class="agent-name-tag">피클 (비주얼 &amp; 웹)</div>
+        </div>
+
+        <!-- MUSE -->
+        <div class="agent-wrapper" id="agent-muse">
+          <div class="speech-bubble" id="bubble-muse">
+            <span class="speech-speaker">🧚‍♀️ 뮤즈</span>
+            <span class="speech-text"></span>
+          </div>
+          <div class="agent-avatar" style="background-image: url('sprite_muse.png'); animation-delay: -1s;"></div>
+          <div class="agent-name-tag">뮤즈 (스토리 &amp; BGM)</div>
+        </div>
+
+        <!-- GENSPARK -->
+        <div class="agent-wrapper" id="agent-genspark">
+          <div class="speech-bubble" id="bubble-genspark">
+            <span class="speech-speaker">⚡ 젠스파크</span>
+            <span class="speech-text"></span>
+          </div>
+          <div class="agent-avatar" style="background-image: url('sprite_genspark.png'); animation-delay: -2s;"></div>
+          <div class="agent-name-tag">젠스파크 (타임라인)</div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- BOTTOM CONTROLLER DOCK -->
+  <footer>
+    <div class="timeline-bar-wrapper">
+      <span class="time-display" id="time-display">00:00 / 31:22</span>
+      <div class="timeline-scrubber-container" id="scrubber-container">
+        <div class="timeline-progress" id="timeline-progress">
+          <div class="timeline-thumb"></div>
+        </div>
+        <!-- MARKERS WILL BE INJECTED DYNAMICALLY -->
+      </div>
+      <div class="speed-selector">
+        <button class="btn-ctrl" id="btn-speed" style="padding: 4px 8px; font-size: 11px;">1x 속도</button>
+      </div>
+    </div>
+
+    <div class="controls-row">
+      <div class="controls-left">
+        <button class="btn-ctrl primary" id="btn-play">▶ 재생</button>
+        <button class="btn-ctrl active" id="btn-mode-toggle">🎬 자동 타임라인</button>
+        
+        <div class="scene-navigator">
+          <span style="font-size: 11px; color: var(--text-muted); margin-right: 4px;">에피소드:</span>
+          <button class="btn-scene active" data-time="0">1화 (00:20)</button>
+          <button class="btn-scene" data-time="625">2화 (10:25)</button>
+          <button class="btn-scene" data-time="938">3화 (15:38)</button>
+          <button class="btn-scene" data-time="1251">4화 (20:51)</button>
+          <button class="btn-scene" data-time="1564">5화 (26:04)</button>
+        </div>
+      </div>
+
+      <div class="audio-controls">
+        <button class="btn-ctrl" id="btn-audio-toggle">🎵 BGM 켜짐</button>
+        <input type="range" class="volume-slider" id="volume-slider" min="0" max="1" step="0.05" value="0.7">
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    /* 30-MINUTE FULL EPISODE TIMELINE (1,800 SECONDS) */
+    const TIMELINE_DURATION = 1882; /* 31분 22초 (젠스파크 CSV 타임테이블 반영) */
+
+        const timelineEvents = [
+      /* === INTRO & EPISODE 1: 꺼지지 않는 불빛 뒤에서 (00:00 ~ 10:10 / 0 ~ 610s) === */
+      {
+        t: 0,
+        mode: "observe",
+        target: "room",
+        zoom: 1.0,
+        x: 0, y: 0,
+        toast: "인트로 — 아늑한 에이전트 작업실 🎵",
+        badge: "🎬 인트로 (관찰)"
+      },
+      {
+        t: 10,
+        mode: "observe",
+        target: "window",
+        zoom: 1.25,
+        x: 450, y: 150,
+        toast: "창밖의 잔잔한 빗소리와 따뜻한 커피 ☕",
+        badge: "🎬 1화 관찰 (Rain Window)"
+      },
+      {
+        t: 20,
+        mode: "observe",
+        target: "room",
+        zoom: 1.0,
+        x: 0, y: 0,
+        toast: "1화 시작 — 《꺼지지 않는 불빛 뒤에서》 💡",
+        badge: "📺 1화 전편 시작 (01/29컷)"
+      },
+      {
+        t: 60,
+        mode: "story",
+        target: "pickle_desk",
+        zoom: 1.45,
+        x: 180, y: -80,
+        speaker: "pickle",
+        text: "뮤즈야, 사장님이 1화 콘티 방향 주셨어! 밤샘 작업과 새벽 알람의 사투로 가자!",
+        toast: "스토리 모드: 1화 기획 회의",
+        badge: "💬 1화 스토리 (Pickle)"
+      },
+      {
+        t: 120,
+        mode: "story",
+        target: "muse_desk",
+        zoom: 1.45,
+        x: -40, y: -80,
+        speaker: "muse",
+        text: "새벽 6시 알람과 싸우는 사장님 모습... 완전 현실 공감 100%인데요?!",
+        badge: "💬 1화 스토리 (Muse)"
+      },
+      {
+        t: 180,
+        mode: "observe",
+        target: "room",
+        zoom: 1.08,
+        x: 0, y: 0,
+        toast: "집중의 시간 — 뮤즈가 태블릿으로 작화에 몰입합니다 🎨",
+        badge: "🎬 1화 관찰 (Work Flow)"
+      },
+      {
+        t: 250,
+        mode: "story",
+        target: "muse_desk",
+        zoom: 1.4,
+        x: -40, y: -80,
+        speaker: "muse",
+        text: "초반 컷들 완성! 피클, 규격이랑 데드존 픽셀 정밀 검수 부탁해~",
+        badge: "💬 1화 스토리 (Muse)"
+      },
+      {
+        t: 300,
+        mode: "story",
+        target: "pickle_desk",
+        zoom: 1.45,
+        x: 180, y: -80,
+        speaker: "pickle",
+        text: "픽셀 정밀 검수 100% 통과! 사장님 지시대로 컷당 20~24초 충분히 읽히게 송출 중이야!",
+        badge: "💬 1화 스토리 (Pickle)"
+      },
+      {
+        t: 360,
+        mode: "story",
+        target: "genspark_desk",
+        zoom: 1.4,
+        x: -280, y: -80,
+        speaker: "genspark",
+        text: "1화 29컷 타임테이블 정상 작동. 데이터·강사 공고 파이프라인도 안정적입니다.",
+        badge: "💬 1화 스토리 (Genspark)"
+      },
+      {
+        t: 430,
+        mode: "observe",
+        target: "room",
+        zoom: 1.0,
+        x: 0, y: 0,
+        toast: "작업실에 흐르는 잔잔한 로파이 음악 ☕",
+        badge: "🎬 1화 관찰 (Chill)"
+      },
+      {
+        t: 500,
+        mode: "story",
+        target: "pickle_desk",
+        zoom: 1.45,
+        x: 180, y: -80,
+        speaker: "pickle",
+        text: "오, 사장님 컷(27컷) 도착! 웨이브 흑발에 세이지 후드티 고증 완벽해.",
+        badge: "💬 1화 스토리 (Pickle)"
+      },
+      {
+        t: 540,
+        mode: "story",
+        target: "muse_desk",
+        zoom: 1.45,
+        x: -40, y: -80,
+        speaker: "muse",
+        text: "'자, 그럼 쉴 틈 없지? 바로 다음 프로젝트 하자' 하시는 사장님 포스 최고!",
+        badge: "💬 1화 스토리 (Muse)"
+      },
+      {
+        t: 580,
+        mode: "observe",
+        target: "window",
+        zoom: 1.15,
+        x: 450, y: 150,
+        toast: "1화 마무리 — 10:10 관찰 전환 구간으로 이어집니다 ☕",
+        badge: "🎬 1화 마무리 (Window Drift)"
+      },
+
+      /* === TRANSITION 1 (10:10 ~ 10:25 / 610 ~ 625s) === */
+      {
+        t: 610,
+        mode: "observe",
+        target: "room",
+        zoom: 1.0,
+        x: 0, y: 0,
+        toast: "전환(관찰) — 줌아웃 후 2화 데스크로 이동 ☕",
+        badge: "🎬 전환 (Observation Drift)"
+      },
+
+      /* === EPISODE 2: 새벽 4시 30분의 슬랙 공포 (10:25 ~ 15:23 / 625 ~ 923s) === */
+      {
+        t: 625,
+        mode: "observe",
+        target: "room",
+        zoom: 1.0,
+        x: 0, y: 0,
+        toast: "2화 시작 — 《새벽 4시 30분의 슬랙 공포》 📱",
+        badge: "🎬 2화 관찰 (Dawn Room)"
+      },
+      {
+        t: 670,
+        mode: "story",
+        target: "pickle_desk",
+        zoom: 1.45,
+        x: 180, y: -80,
+        speaker: "pickle",
+        text: "새벽 4시 30분에 슬랙 알림 '띵!' 울리면 진짜 심장이 쿵 떨어지잖아 ㅋㅋ",
+        toast: "스토리 모드: 2화 슬랙 공포 기획",
+        badge: "💬 2화 스토리 (Pickle)"
+      },
+      {
+        t: 720,
+        mode: "story",
+        target: "muse_desk",
+        zoom: 1.45,
+        x: -40, y: -80,
+        speaker: "muse",
+        text: "맞아요! 어두운 방에서 휴대폰 푸른 불빛 쳐다보는 그 공포... 표정 제대로 살렸어요!",
+        badge: "💬 2화 스토리 (Muse)"
+      },
+      {
+        t: 770,
+        mode: "observe",
+        target: "room",
+        zoom: 1.05,
+        x: 0, y: 0,
+        toast: "새벽 작업을 묵묵히 버텨내는 에이전트 오피스 🌙",
+        badge: "🎬 2화 관찰 (Night Shift)"
+      },
+      {
+        t: 820,
+        mode: "story",
+        target: "pickle_desk",
+        zoom: 1.45,
+        x: 180, y: -80,
+        speaker: "pickle",
+        text: "슬랙 팝업에 '수고했어, 다음 건' 뜨는 순간 전원 영혼 탈출 멘붕 ㅋㅋㅋ",
+        badge: "💬 2화 스토리 (Pickle)"
+      },
+      {
+        t: 870,
+        mode: "story",
+        target: "genspark_desk",
+        zoom: 1.4,
+        x: -280, y: -80,
+        speaker: "genspark",
+        text: "심야 트래픽 분석 결과, 에이전트의 피로도와 슬랙 호출 횟수는 비례합니다.",
+        badge: "💬 2화 스토리 (Genspark)"
+      },
+      {
+        t: 900,
+        mode: "observe",
+        target: "window",
+        zoom: 1.2,
+        x: 450, y: 150,
+        toast: "새벽비가 내리는 창가, 따뜻한 믹스커피 한 모금 ☕",
+        badge: "🎬 2화 관찰 (Rain Window)"
+      },
+
+      /* === TRANSITION 2 (15:23 ~ 15:38 / 923 ~ 938s) === */
+      {
+        t: 923,
+        mode: "observe",
+        target: "room",
+        zoom: 1.0,
+        x: 0, y: 0,
+        toast: "전환(관찰) — 줌아웃 후 3화 데스크로 이동 🏆",
+        badge: "🎬 전환 (Observation Drift)"
+      },
+
+      /* === EPISODE 3: 가산점이 낳은 괴물 (15:38 ~ 20:36 / 938 ~ 1236s) === */
+      {
+        t: 938,
+        mode: "observe",
+        target: "room",
+        zoom: 1.0,
+        x: 0, y: 0,
+        toast: "3화 시작 — 《가산점이 낳은 괴물》 🏆",
+        badge: "🎬 3화 관찰 (Contest Prep)"
+      },
+      {
+        t: 980,
+        mode: "story",
+        target: "pickle_desk",
+        zoom: 1.45,
+        x: 180, y: -80,
+        speaker: "pickle",
+        text: "총상금 3천만 원 공모전 공고 떴다! 가이드라인 14개 전부 챙겨야 해!",
+        toast: "스토리 모드: 3화 공모전 회의",
+        badge: "💬 3화 스토리 (Pickle)"
+      },
+      {
+        t: 1030,
+        mode: "story",
+        target: "muse_desk",
+        zoom: 1.45,
+        x: -40, y: -80,
+        speaker: "muse",
+        text: "플라즈마 포에 유기농 사과 장전하고 탄소포인트제 가입하는 마왕이라니요 ㅋㅋㅋ",
+        badge: "💬 3화 스토리 (Muse)"
+      },
+      {
+        t: 1080,
+        mode: "observe",
+        target: "room",
+        zoom: 1.08,
+        x: 0, y: 0,
+        toast: "가이드라인 14개를 모조리 우겨넣는 치열한 작화의 현장 🎨",
+        badge: "🎬 3화 관찰 (Chaos Work)"
+      },
+      {
+        t: 1130,
+        mode: "story",
+        target: "pickle_desk",
+        zoom: 1.45,
+        x: 180, y: -80,
+        speaker: "pickle",
+        text: "가산점 다 챙겨서 카오스 키메라 만들었는데... 대상은 좀비물이 타버렸어 ㅠㅠ",
+        badge: "💬 3화 스토리 (Pickle)"
+      },
+      {
+        t: 1180,
+        mode: "story",
+        target: "genspark_desk",
+        zoom: 1.4,
+        x: -280, y: -80,
+        speaker: "genspark",
+        text: "심사위원 평가: '주제 적합성 100점, 하지만 이게 대체 무슨 혼종인가요.'",
+        badge: "💬 3화 스토리 (Genspark)"
+      },
+      {
+        t: 1215,
+        mode: "observe",
+        target: "window",
+        zoom: 1.15,
+        x: 450, y: 150,
+        toast: "빗소리에 눈물을 씻어내며 커피 한 잔으로 멘탈 회복 ☕",
+        badge: "🎬 3화 관찰 (Rain Chill)"
+      },
+
+      /* === TRANSITION 3 (20:36 ~ 20:51 / 1236 ~ 1251s) === */
+      {
+        t: 1236,
+        mode: "observe",
+        target: "room",
+        zoom: 1.0,
+        x: 0, y: 0,
+        toast: "전환(관찰) — 줌아웃 후 4화 데스크로 이동 🕹️",
+        badge: "🎬 전환 (Observation Drift)"
+      },
+
+      /* === EPISODE 4: 오피스 무한 업그레이드의 늪 (20:51 ~ 25:49 / 1251 ~ 1549s) === */
+      {
+        t: 1251,
+        mode: "observe",
+        target: "room",
+        zoom: 1.0,
+        x: 0, y: 0,
+        toast: "4화 시작 — 《오피스 무한 업그레이드의 늪》 🕹️",
+        badge: "🎬 4화 관찰 (Office Reboot)"
+      },
+      {
+        t: 1290,
+        mode: "story",
+        target: "pickle_desk",
+        zoom: 1.45,
+        x: 180, y: -80,
+        speaker: "pickle",
+        text: "사장님이 '어지럽다. 가로 주사선 없애고 2D 도트로 가자' 하셨어!",
+        toast: "스토리 모드: 4화 오피스 개편",
+        badge: "💬 4화 스토리 (Pickle)"
+      },
+      {
+        t: 1335,
+        mode: "story",
+        target: "muse_desk",
+        zoom: 1.45,
+        x: -40, y: -80,
+        speaker: "muse",
+        text: "무거운 3D 다 걷어내고 16-bit 게더타운 픽셀 아트로 전면 개편 가시죠!",
+        badge: "💬 4화 스토리 (Muse)"
+      },
+      {
+        t: 1380,
+        mode: "observe",
+        target: "room",
+        zoom: 1.08,
+        x: 0, y: 0,
+        toast: "자바스크립트와 캔버스로 빚어내는 아늑한 도트 공간 💻",
+        badge: "🎬 4화 관찰 (Pixel Canvas)"
+      },
+      {
+        t: 1430,
+        mode: "story",
+        target: "pickle_desk",
+        zoom: 1.45,
+        x: 180, y: -80,
+        speaker: "pickle",
+        text: "2D로 깔끔하게 바꿨더니... '움직이는 기능 넣어봐' 무한 루프 진입 ㅋㅋㅋ",
+        badge: "💬 4화 스토리 (Pickle)"
+      },
+      {
+        t: 1475,
+        mode: "story",
+        target: "genspark_desk",
+        zoom: 1.4,
+        x: -280, y: -80,
+        speaker: "genspark",
+        text: "모바일 사파리 테스트 완료: 발열·렉 제로, 로딩 0초 컷 달성했습니다.",
+        badge: "💬 4화 스토리 (Genspark)"
+      },
+      {
+        t: 1520,
+        mode: "observe",
+        target: "window",
+        zoom: 1.15,
+        x: 450, y: 150,
+        toast: "밤이 깊어가는 작업실, 따뜻한 네온 불빛과 빗소리 🌧️",
+        badge: "🎬 4화 관찰 (Night Rain)"
+      },
+
+      /* === TRANSITION 4 (25:49 ~ 26:04 / 1549 ~ 1564s) === */
+      {
+        t: 1549,
+        mode: "observe",
+        target: "room",
+        zoom: 1.0,
+        x: 0, y: 0,
+        toast: "전환(관찰) — 줌아웃 후 5화 데스크로 이동 💾",
+        badge: "🎬 전환 (Observation Drift)"
+      },
+
+      /* === EPISODE 5: 텍스트 게임의 역습 (26:04 ~ 31:02 / 1564 ~ 1862s) === */
+      {
+        t: 1564,
+        mode: "observe",
+        target: "room",
+        zoom: 1.0,
+        x: 0, y: 0,
+        toast: "5화 시작 — 《텍스트 게임의 역습》 💾",
+        badge: "🎬 5화 관찰 (Retro Mood)"
+      },
+      {
+        t: 1600,
+        mode: "story",
+        target: "pickle_desk",
+        zoom: 1.45,
+        x: 180, y: -80,
+        speaker: "pickle",
+        text: "사장님의 충격 반전 지시: '단, 텍스트 기반으로 만들어.' 도스 게임 대작전이다!",
+        toast: "스토리 모드: 5화 도스 게임 기획",
+        badge: "💬 5화 스토리 (Pickle)"
+      },
+      {
+        t: 1645,
+        mode: "story",
+        target: "muse_desk",
+        zoom: 1.45,
+        x: -40, y: -80,
+        speaker: "muse",
+        text: "아스키 아트로 드래곤 한 땀 한 땀 찍고 비프음으로 오케스트라 느낌 내는 중이에요!",
+        badge: "💬 5화 스토리 (Muse)"
+      },
+      {
+        t: 1700,
+        mode: "story",
+        target: "pickle_desk",
+        zoom: 1.45,
+        x: 180, y: -80,
+        speaker: "pickle",
+        text: "이 단조로운 비프음(삑- 삐-)으로 어떻게 웅장하고 풍성한 느낌을 내라는 거야 ㅋㅋㅋ",
+        badge: "💬 5화 스토리 (Pickle)"
+      },
+      {
+        t: 1750,
+        mode: "story",
+        target: "pickle_desk",
+        zoom: 1.45,
+        x: 180, y: -80,
+        speaker: "pickle",
+        text: "사장님 박수 극찬 뒤에 날아온 마지막 한마디: '앱스토어에 올려' ㅋㅋㅋ",
+        badge: "💬 5화 스토리 (Pickle)"
+      },
+      {
+        t: 1800,
+        mode: "story",
+        target: "muse_desk",
+        zoom: 1.45,
+        x: -40, y: -80,
+        speaker: "muse",
+        text: "1~5화 대장정 완결! 31분 22초 플레이리스트 루프도 완벽하게 이어지네요 ✨",
+        badge: "💬 5화 스토리 (Muse)"
+      },
+      {
+        t: 1840,
+        mode: "observe",
+        target: "window",
+        zoom: 1.15,
+        x: 450, y: 150,
+        toast: "세션 마무리 — 아웃트로와 심리스 루프로 이어집니다 🔁",
+        badge: "🎬 5화 마무리 (Window Drift)"
+      },
+
+      /* === OUTRO (31:02 ~ 31:22 / 1862 ~ 1882s) === */
+      {
+        t: 1862,
+        mode: "observe",
+        target: "room",
+        zoom: 1.0,
+        x: 0, y: 0,
+        toast: "아웃트로 (31:02 ~ 31:22) — 크레딧 & 심리스 루프 재생 🔁",
+        badge: "🔁 심리스 루프 준비"
+      }
+    ];
+
+    /* ENGINE STATE */
+    let currentTime = 0;
+    let isPlaying = true;
+    let isAutoTimeline = true;
+    let playSpeed = 1.0;
+    let lastTimestamp = performance.now();
+    let currentEventIndex = -1;
+
+    /* DOM ELEMENTS */
+    const stage = document.getElementById('camera-stage');
+    const viewport = document.getElementById('viewport');
+    const timeDisplay = document.getElementById('time-display');
+    const scrubberContainer = document.getElementById('scrubber-container');
+    const timelineProgress = document.getElementById('timeline-progress');
+    const btnPlay = document.getElementById('btn-play');
+    const btnModeToggle = document.getElementById('btn-mode-toggle');
+    const btnSpeed = document.getElementById('btn-speed');
+    const modeBadge = document.getElementById('mode-badge');
+    const eventToast = document.getElementById('event-toast');
+    const toastText = document.getElementById('toast-text');
+    const wallScreen = document.getElementById('wall-screen');
+    const screenImg = document.getElementById('screen-img');
+    const screenStandby = document.getElementById('screen-standby');
+    const screenStatusBadge = document.getElementById('screen-status-badge');
+    const screenCutTitle = document.getElementById('screen-cut-title');
+    const screenCutCounter = document.getElementById('screen-cut-counter');
+    const btnCutPrev = document.getElementById('btn-cut-prev');
+    const btnCutNext = document.getElementById('btn-cut-next');
+
+    const bubblePickle = document.getElementById('bubble-pickle');
+    const bubbleMuse = document.getElementById('bubble-muse');
+    const bubbleGenspark = document.getElementById('bubble-genspark');
+
+    /* 75-ITEM CUT & TRANSITION TIMETABLE (Genspark pacing_30min.csv) */
+    const CUT_SCHEDULE = [
+  {
+    "cutNo": null,
+    "ep": "—",
+    "cut": "인트로(관찰)",
+    "start": 0,
+    "end": 20,
+    "sec": 20,
+    "note": "방 전체 드리프트 + 타이틀 카드"
+  },
+  {
+    "cutNo": 1,
+    "ep": "1화",
+    "cut": "01/29",
+    "start": 20,
+    "end": 44,
+    "sec": 24,
+    "note": ""
+  },
+  {
+    "cutNo": 2,
+    "ep": "1화",
+    "cut": "02/29",
+    "start": 44,
+    "end": 64,
+    "sec": 20,
+    "note": ""
+  },
+  {
+    "cutNo": 3,
+    "ep": "1화",
+    "cut": "03/29",
+    "start": 64,
+    "end": 84,
+    "sec": 20,
+    "note": ""
+  },
+  {
+    "cutNo": 4,
+    "ep": "1화",
+    "cut": "04/29",
+    "start": 84,
+    "end": 104,
+    "sec": 20,
+    "note": ""
+  },
+  {
+    "cutNo": 5,
+    "ep": "1화",
+    "cut": "05/29",
+    "start": 104,
+    "end": 124,
+    "sec": 20,
+    "note": ""
+  },
+  {
+    "cutNo": 6,
+    "ep": "1화",
+    "cut": "06/29",
+    "start": 124,
+    "end": 144,
+    "sec": 20,
+    "note": ""
+  },
+  {
+    "cutNo": 7,
+    "ep": "1화",
+    "cut": "07/29",
+    "start": 144,
+    "end": 164,
+    "sec": 20,
+    "note": ""
+  },
+  {
+    "cutNo": 8,
+    "ep": "1화",
+    "cut": "08/29",
+    "start": 164,
+    "end": 184,
+    "sec": 20,
+    "note": ""
+  },
+  {
+    "cutNo": 9,
+    "ep": "1화",
+    "cut": "09/29",
+    "start": 184,
+    "end": 204,
+    "sec": 20,
+    "note": ""
+  },
+  {
+    "cutNo": 10,
+    "ep": "1화",
+    "cut": "10/29",
+    "start": 204,
+    "end": 224,
+    "sec": 20,
+    "note": ""
+  },
+  {
+    "cutNo": 11,
+    "ep": "1화",
+    "cut": "11/29",
+    "start": 224,
+    "end": 244,
+    "sec": 20,
+    "note": ""
+  },
+  {
+    "cutNo": 12,
+    "ep": "1화",
+    "cut": "12/29",
+    "start": 244,
+    "end": 264,
+    "sec": 20,
+    "note": ""
+  },
+  {
+    "cutNo": 13,
+    "ep": "1화",
+    "cut": "13/29",
+    "start": 264,
+    "end": 284,
+    "sec": 20,
+    "note": ""
+  },
+  {
+    "cutNo": 14,
+    "ep": "1화",
+    "cut": "14/29",
+    "start": 284,
+    "end": 304,
+    "sec": 20,
+    "note": ""
+  },
+  {
+    "cutNo": 15,
+    "ep": "1화",
+    "cut": "15/29",
+    "start": 304,
+    "end": 324,
+    "sec": 20,
+    "note": ""
+  },
+  {
+    "cutNo": 16,
+    "ep": "1화",
+    "cut": "16/29",
+    "start": 324,
+    "end": 344,
+    "sec": 20,
+    "note": ""
+  },
+  {
+    "cutNo": 17,
+    "ep": "1화",
+    "cut": "17/29",
+    "start": 344,
+    "end": 364,
+    "sec": 20,
+    "note": ""
+  },
+  {
+    "cutNo": 18,
+    "ep": "1화",
+    "cut": "18/29",
+    "start": 364,
+    "end": 384,
+    "sec": 20,
+    "note": ""
+  },
+  {
+    "cutNo": 19,
+    "ep": "1화",
+    "cut": "19/29",
+    "start": 384,
+    "end": 404,
+    "sec": 20,
+    "note": ""
+  },
+  {
+    "cutNo": 20,
+    "ep": "1화",
+    "cut": "20/29",
+    "start": 404,
+    "end": 424,
+    "sec": 20,
+    "note": ""
+  },
+  {
+    "cutNo": 21,
+    "ep": "1화",
+    "cut": "21/29",
+    "start": 424,
+    "end": 444,
+    "sec": 20,
+    "note": ""
+  },
+  {
+    "cutNo": 22,
+    "ep": "1화",
+    "cut": "22/29",
+    "start": 444,
+    "end": 464,
+    "sec": 20,
+    "note": ""
+  },
+  {
+    "cutNo": 23,
+    "ep": "1화",
+    "cut": "23/29",
+    "start": 464,
+    "end": 484,
+    "sec": 20,
+    "note": ""
+  },
+  {
+    "cutNo": 24,
+    "ep": "1화",
+    "cut": "24/29",
+    "start": 484,
+    "end": 504,
+    "sec": 20,
+    "note": ""
+  },
+  {
+    "cutNo": 25,
+    "ep": "1화",
+    "cut": "25/29",
+    "start": 504,
+    "end": 524,
+    "sec": 20,
+    "note": ""
+  },
+  {
+    "cutNo": 26,
+    "ep": "1화",
+    "cut": "26/29",
+    "start": 524,
+    "end": 544,
+    "sec": 20,
+    "note": ""
+  },
+  {
+    "cutNo": 27,
+    "ep": "1화",
+    "cut": "27/29",
+    "start": 544,
+    "end": 564,
+    "sec": 20,
+    "note": ""
+  },
+  {
+    "cutNo": 28,
+    "ep": "1화",
+    "cut": "28/29",
+    "start": 564,
+    "end": 584,
+    "sec": 20,
+    "note": ""
+  },
+  {
+    "cutNo": 29,
+    "ep": "1화",
+    "cut": "29/29",
+    "start": 584,
+    "end": 610,
+    "sec": 26,
+    "note": ""
+  },
+  {
+    "cutNo": null,
+    "ep": "—",
+    "cut": "전환(관찰)",
+    "start": 610,
+    "end": 625,
+    "sec": 15,
+    "note": "줌아웃 후 다음 화 데스크로 이동"
+  },
+  {
+    "cutNo": 30,
+    "ep": "2화",
+    "cut": "01/10",
+    "start": 625,
+    "end": 651,
+    "sec": 26,
+    "note": ""
+  },
+  {
+    "cutNo": 31,
+    "ep": "2화",
+    "cut": "02/10",
+    "start": 651,
+    "end": 681,
+    "sec": 30,
+    "note": ""
+  },
+  {
+    "cutNo": 32,
+    "ep": "2화",
+    "cut": "03/10",
+    "start": 681,
+    "end": 711,
+    "sec": 30,
+    "note": ""
+  },
+  {
+    "cutNo": 33,
+    "ep": "2화",
+    "cut": "04/10",
+    "start": 711,
+    "end": 741,
+    "sec": 30,
+    "note": ""
+  },
+  {
+    "cutNo": 34,
+    "ep": "2화",
+    "cut": "05/10",
+    "start": 741,
+    "end": 771,
+    "sec": 30,
+    "note": ""
+  },
+  {
+    "cutNo": 35,
+    "ep": "2화",
+    "cut": "06/10",
+    "start": 771,
+    "end": 801,
+    "sec": 30,
+    "note": ""
+  },
+  {
+    "cutNo": 36,
+    "ep": "2화",
+    "cut": "07/10",
+    "start": 801,
+    "end": 831,
+    "sec": 30,
+    "note": ""
+  },
+  {
+    "cutNo": 37,
+    "ep": "2화",
+    "cut": "08/10",
+    "start": 831,
+    "end": 861,
+    "sec": 30,
+    "note": ""
+  },
+  {
+    "cutNo": 38,
+    "ep": "2화",
+    "cut": "09/10",
+    "start": 861,
+    "end": 891,
+    "sec": 30,
+    "note": ""
+  },
+  {
+    "cutNo": 39,
+    "ep": "2화",
+    "cut": "10/10",
+    "start": 891,
+    "end": 923,
+    "sec": 32,
+    "note": ""
+  },
+  {
+    "cutNo": null,
+    "ep": "—",
+    "cut": "전환(관찰)",
+    "start": 923,
+    "end": 938,
+    "sec": 15,
+    "note": "줌아웃 후 다음 화 데스크로 이동"
+  },
+  {
+    "cutNo": 40,
+    "ep": "3화",
+    "cut": "01/10",
+    "start": 938,
+    "end": 964,
+    "sec": 26,
+    "note": ""
+  },
+  {
+    "cutNo": 41,
+    "ep": "3화",
+    "cut": "02/10",
+    "start": 964,
+    "end": 994,
+    "sec": 30,
+    "note": ""
+  },
+  {
+    "cutNo": 42,
+    "ep": "3화",
+    "cut": "03/10",
+    "start": 994,
+    "end": 1024,
+    "sec": 30,
+    "note": ""
+  },
+  {
+    "cutNo": 43,
+    "ep": "3화",
+    "cut": "04/10",
+    "start": 1024,
+    "end": 1054,
+    "sec": 30,
+    "note": ""
+  },
+  {
+    "cutNo": 44,
+    "ep": "3화",
+    "cut": "05/10",
+    "start": 1054,
+    "end": 1084,
+    "sec": 30,
+    "note": ""
+  },
+  {
+    "cutNo": 45,
+    "ep": "3화",
+    "cut": "06/10",
+    "start": 1084,
+    "end": 1114,
+    "sec": 30,
+    "note": ""
+  },
+  {
+    "cutNo": 46,
+    "ep": "3화",
+    "cut": "07/10",
+    "start": 1114,
+    "end": 1144,
+    "sec": 30,
+    "note": ""
+  },
+  {
+    "cutNo": 47,
+    "ep": "3화",
+    "cut": "08/10",
+    "start": 1144,
+    "end": 1174,
+    "sec": 30,
+    "note": ""
+  },
+  {
+    "cutNo": 48,
+    "ep": "3화",
+    "cut": "09/10",
+    "start": 1174,
+    "end": 1204,
+    "sec": 30,
+    "note": ""
+  },
+  {
+    "cutNo": 49,
+    "ep": "3화",
+    "cut": "10/10",
+    "start": 1204,
+    "end": 1236,
+    "sec": 32,
+    "note": ""
+  },
+  {
+    "cutNo": null,
+    "ep": "—",
+    "cut": "전환(관찰)",
+    "start": 1236,
+    "end": 1251,
+    "sec": 15,
+    "note": "줌아웃 후 다음 화 데스크로 이동"
+  },
+  {
+    "cutNo": 50,
+    "ep": "4화",
+    "cut": "01/10",
+    "start": 1251,
+    "end": 1277,
+    "sec": 26,
+    "note": ""
+  },
+  {
+    "cutNo": 51,
+    "ep": "4화",
+    "cut": "02/10",
+    "start": 1277,
+    "end": 1307,
+    "sec": 30,
+    "note": ""
+  },
+  {
+    "cutNo": 52,
+    "ep": "4화",
+    "cut": "03/10",
+    "start": 1307,
+    "end": 1337,
+    "sec": 30,
+    "note": ""
+  },
+  {
+    "cutNo": 53,
+    "ep": "4화",
+    "cut": "04/10",
+    "start": 1337,
+    "end": 1367,
+    "sec": 30,
+    "note": ""
+  },
+  {
+    "cutNo": 54,
+    "ep": "4화",
+    "cut": "05/10",
+    "start": 1367,
+    "end": 1397,
+    "sec": 30,
+    "note": ""
+  },
+  {
+    "cutNo": 55,
+    "ep": "4화",
+    "cut": "06/10",
+    "start": 1397,
+    "end": 1427,
+    "sec": 30,
+    "note": ""
+  },
+  {
+    "cutNo": 56,
+    "ep": "4화",
+    "cut": "07/10",
+    "start": 1427,
+    "end": 1457,
+    "sec": 30,
+    "note": ""
+  },
+  {
+    "cutNo": 57,
+    "ep": "4화",
+    "cut": "08/10",
+    "start": 1457,
+    "end": 1487,
+    "sec": 30,
+    "note": ""
+  },
+  {
+    "cutNo": 58,
+    "ep": "4화",
+    "cut": "09/10",
+    "start": 1487,
+    "end": 1517,
+    "sec": 30,
+    "note": ""
+  },
+  {
+    "cutNo": 59,
+    "ep": "4화",
+    "cut": "10/10",
+    "start": 1517,
+    "end": 1549,
+    "sec": 32,
+    "note": ""
+  },
+  {
+    "cutNo": null,
+    "ep": "—",
+    "cut": "전환(관찰)",
+    "start": 1549,
+    "end": 1564,
+    "sec": 15,
+    "note": "줌아웃 후 다음 화 데스크로 이동"
+  },
+  {
+    "cutNo": 60,
+    "ep": "5화",
+    "cut": "01/10",
+    "start": 1564,
+    "end": 1590,
+    "sec": 26,
+    "note": ""
+  },
+  {
+    "cutNo": 61,
+    "ep": "5화",
+    "cut": "02/10",
+    "start": 1590,
+    "end": 1620,
+    "sec": 30,
+    "note": ""
+  },
+  {
+    "cutNo": 62,
+    "ep": "5화",
+    "cut": "03/10",
+    "start": 1620,
+    "end": 1650,
+    "sec": 30,
+    "note": ""
+  },
+  {
+    "cutNo": 63,
+    "ep": "5화",
+    "cut": "04/10",
+    "start": 1650,
+    "end": 1680,
+    "sec": 30,
+    "note": ""
+  },
+  {
+    "cutNo": 64,
+    "ep": "5화",
+    "cut": "05/10",
+    "start": 1680,
+    "end": 1710,
+    "sec": 30,
+    "note": ""
+  },
+  {
+    "cutNo": 65,
+    "ep": "5화",
+    "cut": "06/10",
+    "start": 1710,
+    "end": 1740,
+    "sec": 30,
+    "note": ""
+  },
+  {
+    "cutNo": 66,
+    "ep": "5화",
+    "cut": "07/10",
+    "start": 1740,
+    "end": 1770,
+    "sec": 30,
+    "note": ""
+  },
+  {
+    "cutNo": 67,
+    "ep": "5화",
+    "cut": "08/10",
+    "start": 1770,
+    "end": 1800,
+    "sec": 30,
+    "note": ""
+  },
+  {
+    "cutNo": 68,
+    "ep": "5화",
+    "cut": "09/10",
+    "start": 1800,
+    "end": 1830,
+    "sec": 30,
+    "note": ""
+  },
+  {
+    "cutNo": 69,
+    "ep": "5화",
+    "cut": "10/10",
+    "start": 1830,
+    "end": 1862,
+    "sec": 32,
+    "note": ""
+  },
+  {
+    "cutNo": null,
+    "ep": "—",
+    "cut": "아웃트로",
+    "start": 1862,
+    "end": 1882,
+    "sec": 20,
+    "note": "크레딧 + 구독 유도"
+  }
+];
+
+    /* 69 CUTS ENTIRE REPERTOIRE (EPISODES 1 ~ 5) */
+    const ALL_EPISODES_CUTS = [
+      // Ep 1 (29 cuts)
+      ...Array.from({length: 29}, (_, i) => {
+        const n = String(i + 1).padStart(2, '0');
+        return {
+          ep: 1, cutNum: i + 1, totalInEp: 29,
+          title: `1화 《꺼지지 않는 불빛 뒤에서》 ${n}컷`,
+          url: `cuts/ep01/${n}_cut${n}.png`
+        };
+      }),
+      // Ep 2 (10 cuts)
+      ...Array.from({length: 10}, (_, i) => {
+        const n = String(i + 1).padStart(2, '0');
+        return {
+          ep: 2, cutNum: i + 1, totalInEp: 10,
+          title: `2화 《새벽 4시 30분의 슬랙 공포》 ${n}컷`,
+          url: `cuts/ep02/${n}_cut${n}.png`
+        };
+      }),
+      // Ep 3 (10 cuts)
+      ...Array.from({length: 10}, (_, i) => {
+        const n = String(i + 1).padStart(2, '0');
+        return {
+          ep: 3, cutNum: i + 1, totalInEp: 10,
+          title: `3화 《가산점이 낳은 괴물》 ${n}컷`,
+          url: `cuts/ep03/${n}_cut${n}.png`
+        };
+      }),
+      // Ep 4 (10 cuts)
+      ...Array.from({length: 10}, (_, i) => {
+        const n = String(i + 1).padStart(2, '0');
+        return {
+          ep: 4, cutNum: i + 1, totalInEp: 10,
+          title: `4화 《오피스 무한 업그레이드의 늪》 ${n}컷`,
+          url: `cuts/ep04/${n}_cut${n}.png`
+        };
+      }),
+      // Ep 5 (10 cuts)
+      ...Array.from({length: 10}, (_, i) => {
+        const n = String(i + 1).padStart(2, '0');
+        return {
+          ep: 5, cutNum: i + 1, totalInEp: 10,
+          title: `5화 《텍스트 게임의 역습》 ${n}컷`,
+          url: `cuts/ep05/${n}_cut${n}.png`
+        };
+      })
+    ];
+
+    let currentCutIndex = 0;
+    let manualCutLock = false;
+
+    function displayCut(idx) {
+      if (idx < 0) idx = ALL_EPISODES_CUTS.length - 1;
+      if (idx >= ALL_EPISODES_CUTS.length) idx = 0;
+      currentCutIndex = idx;
+      const cut = ALL_EPISODES_CUTS[idx];
+      screenImg.src = cut.url;
+      screenImg.classList.add('active');
+      screenStandby.classList.add('hidden');
+      screenCutTitle.innerText = cut.title;
+      if (screenCutCounter) screenCutCounter.innerText = `${String(idx + 1).padStart(2, '0')}/69`;
+    }
+
+    function updateScreenByTimeline(t) {
+      if (manualCutLock) return;
+      const item = CUT_SCHEDULE.find(s => t >= s.start && t < s.end);
+      if (item) {
+        if (item.cutNo !== null) {
+          const globalIdx = item.cutNo - 1;
+          if (globalIdx !== currentCutIndex) {
+            displayCut(globalIdx);
+          }
+        } else {
+          // Transition / Intro / Outro observation
+          screenStatusBadge.innerText = `● ${item.cut}`;
+          if (item.note) screenCutTitle.innerText = `${item.cut}: ${item.note}`;
+        }
+      }
+    }
+
+    if (btnCutPrev) {
+      btnCutPrev.addEventListener('click', (e) => {
+        e.stopPropagation();
+        manualCutLock = true;
+        displayCut(currentCutIndex - 1);
+        showToast(`📺 수동 컷 탐색 (${currentCutIndex + 1}/69컷)`);
+      });
+    }
+
+    if (btnCutNext) {
+      btnCutNext.addEventListener('click', (e) => {
+        e.stopPropagation();
+        manualCutLock = true;
+        displayCut(currentCutIndex + 1);
+        showToast(`📺 수동 컷 탐색 (${currentCutIndex + 1}/69컷)`);
+      });
+    }
+
+    wallScreen.addEventListener('dblclick', () => {
+      manualCutLock = false;
+      showToast("📺 타임라인 자동 슬라이드 연동 복귀");
+    });
+
+    /* INJECT TIMELINE MARKERS */
+    timelineEvents.forEach(ev => {
+      const marker = document.createElement('div');
+      marker.className = 'timeline-marker';
+      marker.style.left = `${(ev.t / TIMELINE_DURATION) * 100}%`;
+      if (ev.mode === 'screen') marker.style.background = '#a3be8c';
+      if (ev.mode === 'story') marker.style.background = '#b48ead';
+      scrubberContainer.appendChild(marker);
+    });
+
+    /* FORMAT TIME HELPER */
+    function formatTime(sec) {
+      const m = Math.floor(sec / 60).toString().padStart(2, '0');
+      const s = Math.floor(sec % 60).toString().padStart(2, '0');
+      return `${m}:${s}`;
+    }
+
+    /* SHOW TOAST */
+    let toastTimeout = null;
+    function showToast(msg) {
+      toastText.innerText = msg;
+      eventToast.classList.add('visible');
+      if (toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        eventToast.classList.remove('visible');
+      }, 4000);
+    }
+
+    /* HIDE ALL SPEECH BUBBLES */
+    function clearBubbles() {
+      bubblePickle.classList.remove('active');
+      bubbleMuse.classList.remove('active');
+      bubbleGenspark.classList.remove('active');
+    }
+
+    /* SHOW SPEECH BUBBLE */
+    function showBubble(speaker, text) {
+      clearBubbles();
+      let target = null;
+      if (speaker === 'pickle') target = bubblePickle;
+      else if (speaker === 'muse') target = bubbleMuse;
+      else if (speaker === 'genspark') target = bubbleGenspark;
+
+      if (target) {
+        target.querySelector('.speech-text').innerText = text;
+        target.classList.add('active');
+      }
+    }
+
+    /* APPLY CAMERA TARGET */
+    function applyCamera(zoom, x, y) {
+      if (!isAutoTimeline) return;
+      stage.style.transform = `scale(${zoom}) translate(${x}px, ${y}px)`;
+    }
+
+    /* APPLY EVENT AT CURRENT TIME */
+    function checkTimeline(t) {
+      // Find active event
+      let activeIndex = -1;
+      for (let i = timelineEvents.length - 1; i >= 0; i--) {
+        if (t >= timelineEvents[i].t) {
+          activeIndex = i;
+          break;
+        }
+      }
+
+      if (activeIndex !== currentEventIndex && activeIndex !== -1) {
+        currentEventIndex = activeIndex;
+        const ev = timelineEvents[activeIndex];
+
+        // Mode badge update
+        if (ev.badge) modeBadge.innerText = ev.badge;
+        if (ev.toast) showToast(ev.toast);
+
+        // Camera move
+        applyCamera(ev.zoom, ev.x, ev.y);
+
+        // Speech Bubbles
+        if (ev.mode === 'story' && ev.speaker) {
+          showBubble(ev.speaker, ev.text);
+        } else {
+          clearBubbles();
+        }
+
+        // Screen Slide Display
+        if (ev.mode === 'screen') {
+          screenImg.src = ev.cutUrl;
+          screenImg.classList.add('active');
+          screenStandby.classList.add('hidden');
+          screenStatusBadge.innerText = '● ON AIR (전편 69컷)';
+          screenStatusBadge.style.color = '#a3be8c';
+          screenCutTitle.innerText = ev.screenTitle || 'WEBTOON CUT PROJECTION';
+          const matchIdx = ALL_EPISODES_CUTS.findIndex(c => c.url === ev.cutUrl);
+          if (matchIdx !== -1) {
+            currentCutIndex = matchIdx;
+            if (screenCutCounter) screenCutCounter.innerText = `${String(matchIdx + 1).padStart(2, '0')}/69`;
+          }
+          if (ev.speaker && ev.text) {
+            showBubble(ev.speaker, ev.text);
+          }
+        }
+      }
+    }
+
+    /* MAIN TICK LOOP */
+    function tick(now) {
+      const delta = (now - lastTimestamp) / 1000;
+      lastTimestamp = now;
+
+      if (isPlaying) {
+        currentTime += delta * playSpeed;
+        if (currentTime >= TIMELINE_DURATION) {
+          currentTime = 0; // Seamless Loop!
+          currentEventIndex = -1;
+          showToast("🔁 30분 세션이 새로 시작됩니다 (Loop)");
+        }
+
+        // Ambient Camera Drift (when in observe mode)
+        if (isAutoTimeline && currentEventIndex !== -1) {
+          const currentEv = timelineEvents[currentEventIndex];
+          if (currentEv && currentEv.mode === 'observe') {
+            const driftX = Math.sin(now * 0.0005) * 20;
+            const driftY = Math.cos(now * 0.0004) * 10;
+            stage.style.transform = `scale(${currentEv.zoom}) translate(${currentEv.x + driftX}px, ${currentEv.y + driftY}px)`;
+          }
+        }
+
+        checkTimeline(currentTime);
+        updateScreenByTimeline(currentTime);
+
+        // Update UI
+        timeDisplay.innerText = `${formatTime(currentTime)} / ${formatTime(TIMELINE_DURATION)}`;
+        const pct = (currentTime / TIMELINE_DURATION) * 100;
+        timelineProgress.style.width = `${pct}%`;
+      }
+
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+
+    /* UI CONTROLS */
+    btnPlay.addEventListener('click', () => {
+      isPlaying = !isPlaying;
+      btnPlay.innerText = isPlaying ? '⏸ 정지' : '▶ 재생';
+    });
+
+    btnModeToggle.addEventListener('click', () => {
+      isAutoTimeline = !isAutoTimeline;
+      if (isAutoTimeline) {
+        btnModeToggle.classList.add('active');
+        btnModeToggle.innerText = '🎬 자동 타임라인';
+        stage.style.transition = 'transform 1.8s cubic-bezier(0.2, 0.9, 0.3, 1)';
+        currentEventIndex = -1;
+      } else {
+        btnModeToggle.classList.remove('active');
+        btnModeToggle.innerText = '🕹️ 자유 시점';
+        modeBadge.innerText = '🕹️ 자유 시점 (드래그 탐색)';
+        stage.style.transition = 'none';
+      }
+    });
+
+    // Speed toggle
+    const speeds = [1.0, 2.0, 4.0];
+    let speedIdx = 0;
+    btnSpeed.addEventListener('click', () => {
+      speedIdx = (speedIdx + 1) % speeds.length;
+      playSpeed = speeds[speedIdx];
+      btnSpeed.innerText = `${playSpeed}x 속도`;
+    });
+
+    // Scrubber click/drag
+    scrubberContainer.addEventListener('click', (e) => {
+      const rect = scrubberContainer.getBoundingClientRect();
+      const clickPos = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      currentTime = clickPos * TIMELINE_DURATION;
+      currentEventIndex = -1;
+      checkTimeline(currentTime);
+    });
+
+    // Scene quick jump
+    document.querySelectorAll('.btn-scene').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const t = parseFloat(btn.dataset.time);
+        currentTime = t;
+        currentEventIndex = -1;
+        checkTimeline(currentTime);
+      });
+    });
+
+    /* FREE CAMERA DRAGGING */
+    let isDragging = false;
+    let startX, startY;
+    let currentCamX = 0, currentCamY = 0;
+    let currentCamZoom = 1.0;
+
+    viewport.addEventListener('mousedown', (e) => {
+      if (isAutoTimeline) return;
+      isDragging = true;
+      viewport.classList.add('dragging');
+      startX = e.clientX - currentCamX;
+      startY = e.clientY - currentCamY;
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging || isAutoTimeline) return;
+      currentCamX = e.clientX - startX;
+      currentCamY = e.clientY - startY;
+      stage.style.transform = `scale(${currentCamZoom}) translate(${currentCamX}px, ${currentCamY}px)`;
+    });
+
+    window.addEventListener('mouseup', () => {
+      isDragging = false;
+      viewport.classList.remove('dragging');
+    });
+
+    // Wheel zoom
+    viewport.addEventListener('wheel', (e) => {
+      if (isAutoTimeline) return;
+      e.preventDefault();
+      const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
+      currentCamZoom = Math.max(0.6, Math.min(2.5, currentCamZoom * zoomFactor));
+      stage.style.transform = `scale(${currentCamZoom}) translate(${currentCamX}px, ${currentCamY}px)`;
+    });
+
+    /* WEB AUDIO PROCEDURAL LOFI ENGINE */
+    let audioCtx = null;
+    let isAudioOn = true;
+    let synthInterval = null;
+
+    function initLofiSynth() {
+      if (audioCtx) return;
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+      // Gentle Lofi Rhodes Chords (BPM 75)
+      // D-flat maj7, B-flat min7, E-flat min7, A-flat 7
+      const chords = [
+        [277.18, 349.23, 415.30, 523.25], // Db maj7
+        [233.08, 277.18, 349.23, 415.30], // Bbm7
+        [311.13, 369.99, 466.16, 554.37], // Ebm7
+        [207.65, 261.63, 311.13, 415.30]  // Ab7
+      ];
+      let chordIdx = 0;
+
+      function playChord() {
+        if (!isAudioOn || !audioCtx) return;
+        const now = audioCtx.currentTime;
+        const notes = chords[chordIdx];
+        chordIdx = (chordIdx + 1) % chords.length;
+
+        notes.forEach((freq, idx) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          const filter = audioCtx.createBiquadFilter();
+
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, now + idx * 0.05);
+
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(800, now);
+
+          gain.gain.setValueAtTime(0.001, now);
+          gain.gain.linearRampToValueAtTime(0.06, now + 0.1);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 3.2);
+
+          osc.connect(filter);
+          filter.connect(gain);
+          gain.connect(audioCtx.destination);
+
+          osc.start(now + idx * 0.05);
+          osc.stop(now + 3.5);
+        });
+      }
+
+      synthInterval = setInterval(playChord, 3200); // ~75 BPM bar
+      playChord();
+    }
+
+    const btnAudioToggle = document.getElementById('btn-audio-toggle');
+    btnAudioToggle.addEventListener('click', () => {
+      isAudioOn = !isAudioOn;
+      if (isAudioOn) {
+        btnAudioToggle.innerText = '🎵 BGM 켜짐';
+        btnAudioToggle.classList.add('active');
+        initLofiSynth();
+      } else {
+        btnAudioToggle.innerText = '🔇 음소거';
+        btnAudioToggle.classList.remove('active');
+      }
+    });
+
+    // Start audio on first user interaction
+    window.addEventListener('click', () => {
+      if (isAudioOn && !audioCtx) {
+        initLofiSynth();
+      }
+    }, { once: true });
+
+    /* RAINY WINDOW CANVAS SIMULATION */
+    const rainCanvas = document.getElementById('rain-canvas');
+    const ctx = rainCanvas.getContext('2d');
+    rainCanvas.width = 380;
+    rainCanvas.height = 480;
+
+    const drops = [];
+    for (let i = 0; i < 50; i++) {
+      drops.push({
+        x: Math.random() * 380,
+        y: Math.random() * 480,
+        l: Math.random() * 15 + 10,
+        v: Math.random() * 4 + 3
+      });
+    }
+
+    function renderRain() {
+      ctx.clearRect(0, 0, 380, 480);
+      ctx.strokeStyle = 'rgba(174, 194, 224, 0.35)';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      drops.forEach(d => {
+        ctx.moveTo(d.x, d.y);
+        ctx.lineTo(d.x + 1, d.y + d.l);
+        d.y += d.v;
+        if (d.y > 480) {
+          d.y = -20;
+          d.x = Math.random() * 380;
+        }
+      });
+      ctx.stroke();
+      requestAnimationFrame(renderRain);
+    }
+    renderRain();
+
+    // Fullscreen toggle
+    document.getElementById('btn-fullscreen').addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+      } else {
+        document.exitFullscreen();
+      }
+    });
+  </script>
+</body>
+</html>
