@@ -2323,17 +2323,17 @@
   } catch(e) {}
 
   var TRACKS = [
-    {src:'music/track01_jazz_study_pt1.mp3', name:'Jazz Study Pt. 1 — 따뜻한 피아노와 함께 시작하는 아침 업무'},
-    {src:'music/track02_jazz_study_pt2.mp3', name:'Jazz Study Pt. 2 — 부드러운 스윙 리듬, 차분한 몰입의 순간'},
-    {src:'music/track03_jazz_study_pt3.mp3', name:'Jazz Study Pt. 3 — 감미로운 멜로디와 함께 깊어지는 집중'},
-    {src:'music/track04_jazz_study_pt4.mp3', name:'Jazz Study Pt. 4 — 나른한 오후를 깨우는 산뜻한 터치'},
-    {src:'music/track05_jazz_study_pt5.mp3', name:'Jazz Study Pt. 5 — 리드미컬한 베이스 워킹, 생각의 흐름'},
-    {src:'music/track06_jazz_study_pt6.mp3', name:'Jazz Study Pt. 6 — 에이전트들의 타이핑 소리와 어우러지는 선율'},
-    {src:'music/track07_jazz_study_pt7_cinematic.mp3', name:'Jazz Study Pt. 7 (Cinematic) — 한 편의 영화 같은 분위기 전환'},
-    {src:'music/track08_jazz_study_pt8_cinematic.mp3', name:'Jazz Study Pt. 8 (Cinematic) — 노을빛 창가, 서정적인 피아노'},
-    {src:'music/track09_jazz_study_pt9_bossa_nova.mp3', name:'Jazz Study Pt. 9 (Bossa Nova) — 경쾌한 보사노바 리듬, 기분 좋은 쉼표'},
-    {src:'music/track10_jazz_study_pt10_bossa_nova.mp3', name:'Jazz Study Pt. 10 (Bossa Nova) — 부드러운 바람처럼 흘러가는 리듬'},
-    {src:'music/track11_jazz_study_pt11_bossa_nova.mp3', name:'Jazz Study Pt. 11 (Bossa Nova) — 편안한 밤, 완벽한 하루의 마무리'}
+    {src:'music/user_pt01.mp3', name:'Jazz Study Pt. 1', cap:'잔잔하게 문을 여는 아침의 재즈'},
+    {src:'music/user_pt02.mp3', name:'Jazz Study Pt. 2', cap:'집중이 깊어지는 오전의 스윙'},
+    {src:'music/user_pt03.mp3', name:'Jazz Study Pt. 3', cap:'책상 앞 리듬이 몸에 배는 시간'},
+    {src:'music/user_pt04.mp3', name:'Jazz Study Pt. 4', cap:'점심 전, 느긋하게 흐르는 그루브'},
+    {src:'music/user_pt05.mp3', name:'Jazz Study Pt. 5', cap:'오후의 졸음을 깨우는 경쾌한 멜로디'},
+    {src:'music/user_pt06.mp3', name:'Jazz Study Pt. 6', cap:'해 질 녘까지 잔잔히 이어지는 재즈'},
+    {src:'music/user_pt07.mp3', name:'Jazz Study Pt. 7 · Cinematic', cap:'영화의 한 장면처럼 펼쳐지는 사운드'},
+    {src:'music/user_pt08.mp3', name:'Jazz Study Pt. 8 · Cinematic', cap:'서사가 흐르는 시네마틱 재즈'},
+    {src:'music/user_pt09.mp3', name:'Jazz Study Pt. 9 · Bossa Nova', cap:'바람처럼 부드럽게 스미는 보사노바'},
+    {src:'music/user_pt10.mp3', name:'Jazz Study Pt. 10 · Bossa Nova', cap:'햇살 아래 흔들리는 보사의 리듬'},
+    {src:'music/user_pt11.mp3', name:'Jazz Study Pt. 11 · Bossa Nova', cap:'여유롭게 마무리하는 마지막 보사노바'}
   ];
 
   var audio = document.getElementById('sAudio');
@@ -2347,9 +2347,8 @@
   function load(i) {
     idx = (i + TRACKS.length) % TRACKS.length;
     audio.src = TRACKS[idx].src;
-    var parts = TRACKS[idx].name.split(' — ');
-    if (sTitle) sTitle.textContent = '♪ ' + parts[0];
-    if (sDesc) sDesc.textContent = parts[1] || '';
+    if (sTitle) sTitle.textContent = '♪ ' + TRACKS[idx].name;
+    if (sDesc) sDesc.textContent = TRACKS[idx].cap || '';
   }
 
   function toggle() {
